@@ -38,6 +38,14 @@ All entries below were fetched and read on 2026-11-23 unless marked otherwise.
   Use for: what an editable install is and when a reinstall is needed.
 - [Docs: Python language reference, "The assert statement"](https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement) and [Python tutorial, "Floating-Point Arithmetic: Issues and Limitations"](https://docs.python.org/3/tutorial/floatingpoint.html)
   Use for: what `assert` does (and that `python -O` removes it), and why `0.1 + 0.2` is not `0.3`.
+- [Docs: Google Colab, "Using Google Colab with GitHub"](https://colab.research.google.com/github/googlecolab/colabtools/blob/main/notebooks/colab-github-demo.ipynb) (the notebook in `googlecolab/colabtools`)
+  Use for: the link form `https://colab.research.google.com/github/<user>/<repo>/blob/<branch>/<path>.ipynb` ("Colab can load public github notebooks directly, with no required authorization step"), and that opening one gives "a new editable view of the notebook", saved with File, Save a copy in Drive.
+- [Data: `googlecolab/backend-info`](https://github.com/googlecolab/backend-info), files `pip-freeze.txt` and `apt-list.txt` (last changed 2026-11-20)
+  Use for: what Colab ships. On 2026-11-23: Python 3.13.18, pandas 2.2.3, pytest 8.4.2, pip 26.2.2, numpy 2.4.6. The README warns the files can be a day or two ahead of the live runtime.
+- [Docs: Google Colab, "Frequently Asked Questions - Past Runtime Versions"](https://research.google.com/colaboratory/runtime-version-faq.html)
+  Use for: "we recommend using the latest runtime version… and adding code to your notebook to install specific versions of libraries that you need", which is why each notebook starts with a `%pip install` of pinned versions and does not pin a runtime.
+- [Docs: IPython, "Built-in magic commands"](https://ipython.readthedocs.io/en/stable/interactive/magics.html)
+  Use for: `%%writefile [-a] filename`: "Write the contents of the cell to a file. The file will be overwritten unless the -a (--append) flag is specified."
 - For the extension: pytest ["How to parametrize fixtures and test functions"](https://docs.pytest.org/en/stable/how-to/parametrize.html), ["How to use fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html), ["How to use temporary directories and files in tests"](https://docs.pytest.org/en/stable/how-to/tmp_path.html), ["How to use skip and xfail…"](https://docs.pytest.org/en/stable/how-to/skipping.html); [Coverage.py](https://coverage.readthedocs.io/en/latest/) (documents 7.17.5) and the [pytest-cov README](https://pytest-cov.readthedocs.io/en/latest/readme.html); [GitHub Docs, "Building and testing Python"](https://docs.github.com/en/actions/tutorials/build-and-test-code/python).
   Skimmed, not studied. Use for: the objectives in `OBJECTIVES.md`. Read each one properly before writing its lesson.
 
@@ -56,6 +64,7 @@ All entries below were fetched and read on 2026-11-23 unless marked otherwise.
 - The pandas reference does not say in words that `assert_series_equal()` treats missing values in the same position as equal. Lesson 4 states it on the strength of a run, and says so in its margin note.
 - The Scientific Python guide's taxonomy puts extensive edge-case testing in a separate suite from unit tests ("Avoid the temptation to test edge-cases!" in unit tests). This course does not divide tests into suites, and Lesson 4 teaches edge cases in the same file. If a student reads the guide and asks, that is the difference.
 - No source yet for the limits of coverage, and none read for snapshot testing, mocking beyond a skim, data validation, or Hypothesis.
+- The notebooks have not been run in a real Colab session. Colab's "Overview of Colab features" notebook, which documents `!` commands, could not be fetched (404 at the path tried), so the statement that each `!` line runs in its own shell rests on IPython's behaviour, seen in the local runs.
 - Editor integration (the Testing panel in VS Code and Positron, PyCharm's runner) has not been checked against official documentation, so the lessons use the terminal only.
 
 ## Findings from running the code (not in the docs above)

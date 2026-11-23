@@ -24,7 +24,16 @@ The learner in this workspace is Andy's students, not Andy. Lessons speak to a f
 - `devtools::load_all()` and `devtools::check()` have no direct counterpart. The working loop in Lesson 5 uses `pytest -k`, `--lf` and `-x` instead.
 - Extension topics: parametrised tests take the place of snapshot tests (see `OBJECTIVES.md`).
 
+## Google Colab notebooks (Andy asked 2026-11-23; design choices are Claude's, not yet reviewed)
+- One notebook per lesson in `notebooks/`, named like the lesson page, linked from a "Run it in your browser" box under "By the end you can" and from the index.
+- Notebooks keep the file-based workflow: `%%writefile` stands in for the editor and `!cd cleaning-project && python -m pytest` for the terminal. The `cd … &&` prefix is there because every `!` line starts in the notebook's folder; it also makes cells safe to rerun.
+- Versions: Colab ships Python 3.13.18, pandas 2.2.3, pytest 8.4.2 and pip 26.2.2 (checked 2026-11-23, see `RESOURCES.md`). The first cell of every notebook installs the pandas and pytest the pages quote, which is what Colab's own FAQ recommends over pinning a runtime. Python stays at Colab's version.
+- Lesson 5 in Colab skips the virtual environment (a Colab runtime is already a throwaway one, and activation would not survive from one `!` line to the next) and runs `pip install -e . --group dev` in the runtime. The venv commands are listed at the end of the notebook for the student's own computer.
+- Lesson 1's two assertions that fail on purpose are tagged `raises-exception`. "Run all" in Colab stops at the first; the notebook says so.
+- Not yet verified in a real Colab session (needs a signed-in Google account): that the links open, whether the pandas upgrade triggers a "Restart session" prompt, and what pip's dependency-conflict message looks like. The notebooks are executed on Windows (Python 3.14) locally and on Linux (Python 3.13) in CI.
+
 ## Conventions
+- Notebooks are generated: edit `tools/build_notebooks.py`, run it, then run `tools/check_notebooks.py`. The generator takes its files from `examples/` and its steps from `tools/check_outputs.py`, so a change to a lesson's steps is made there once. When the versions quoted on the pages change, change `PANDAS` and `PYTEST` in the generator too. A new lesson needs a builder in the generator, an `EXPECTED` list in the checker, and the Colab box on its page.
 - Every lesson links `assets/course.css` and `assets/course.js`; no page-specific CSS or JS. The stylesheet is the same file as the R course's. If the design changes, change both.
 - Lesson files: `lessons/000N-dash-case.html`. Each has: eyebrow, h1, lede, "By the end you can", warm-up quiz on the previous lesson (from lesson 2), teaching sections with margin citations, "Try it", "Check yourself" quiz, primary source box, ask box, pager.
 - Code figures: `class="code py"` for Python, `code sh` for terminal commands, `code toml` for settings files (all three get a copy button), `code out` for output, with `pass` or `fail` to colour the edge.
