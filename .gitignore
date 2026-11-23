@@ -10,3 +10,6 @@ htmlcov/
 .ipynb_checkpoints/
 .DS_Store
 Thumbs.db
+
+# Review checklists written for Andy after a round of changes (not part of the course)
+*-CHECKLIST.docx
