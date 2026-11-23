@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 1: Your first assertion · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="0001-first-assertion.html" aria-current="page">1 Assertions</a>
+    <a href="0002-test-functions-and-test-files.html">2 Test files</a>
+    <a href="0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="0004-edge-cases-errors-and-bugs.html">4 Edge cases</a>
+    <a href="0005-from-project-to-package.html">5 Packages</a>
+    <a href="../reference/cheat-sheet.html">Cheat sheet</a>
+    <a href="../reference/glossary.html">Glossary</a>
+    <a href="../reference/mastery-objectives.html">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Lesson 1 of 5 · about 20 minutes</p>
+  <h1>Your first assertion</h1>
+  <p class="lede">You already test your code. You run a function, look at what comes back, and decide whether it seems right. This lesson turns that glance into one line of Python that can be run again tomorrow.</p>
+
+  <div class="win">
+    <span class="label">By the end you can</span>
+    <p>Write an <code>assert</code> statement for a function of your own, and tell a pass from a failure.</p>
+  </div>
+
+  <h2>The check that disappears</h2>
+  <p>Here is a small helper of the kind you write all the time while cleaning data. It rescales a numeric column so that its smallest value becomes 0 and its largest becomes 1. Type it into a Python console or a notebook cell.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>import pandas as pd
+
+def rescale01(x):
+    lo, hi = x.min(), x.max()
+    return (x - lo) / (hi - lo)
+
+rescale01(pd.Series([0, 5, 10]))</code></pre>
+  </figure>
+  <figure class="code out">
+    <figcaption><span>Console</span></figcaption>
+<pre>0    0.0
+1    0.5
+2    1.0
+dtype: float64</pre>
+  </figure>
+
+  <p>That looks right, and you move on. The trouble is that the check lived only in your head. Next month you change <code>rescale01()</code>, or a classmate does, and nobody repeats it. A <a href="../reference/glossary.html#unit-test">unit test</a> is the same check written down as code, so the computer can repeat it for you after every change.</p>
+
+  <p>The Scientific Python Development Guide lists four ways this pays off: code you can trust to behave as expected; a living record of how the code is meant to behave, checked every time the test runs; protection against failure, from mistakes in your own code to changes in the packages you depend on; and the confidence to add features, fix bugs and reorganise code without breaking what already works.</p>
+  <span class="cite">Source: <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide, “Testing recommendations”</a>, section “Advantages of Testing”.</span>
+
+  <h2>Say what you expect</h2>
+  <p>Python has a statement built for this: <code>assert</code>. It takes a condition. If the condition is true, nothing happens. If it is false, Python stops with an error. One <code>assert</code> statement is an <a href="../reference/glossary.html#assertion">assertion</a>, and it is the building block of every test you will write.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 1]</code></pre>
+  </figure>
+
+  <p>Run it, and nothing is printed. <strong>Silence means the assertion passed.</strong> Read the line as a sentence: “I assert that <code>rescale01()</code> of 0, 5 and 10, as a list, equals <code>[0, 0.5, 1]</code>.” The <code>.tolist()</code> turns the column into a plain Python list, so that <code>==</code> gives one answer for the whole thing. <a href="0003-choosing-assertions.html">Lesson 3</a> shows what goes wrong without it.</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Position</th><th>Name</th><th>What you put there</th></tr></thead>
+    <tbody>
+      <tr><td>Left of <code>==</code></td><td><a href="../reference/glossary.html#actual">actual</a></td><td>A call to your function. Python runs it.</td></tr>
+      <tr><td>Right of <code>==</code></td><td><a href="../reference/glossary.html#expected">expected</a></td><td>The right answer, which you work out yourself and type in.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <span class="cite">“pytest allows you to use the standard Python <code>assert</code> for verifying expectations and values in Python tests.” <a href="https://docs.pytest.org/en/stable/how-to/assert.html">pytest, “How to write and report assertions in tests”</a>. The statement itself: <a href="https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement">Python language reference</a>.</span>
+
+  <h2>Watch one fail</h2>
+  <p>A check you have never seen fail is a check you cannot trust yet. Change the expected value so that it is wrong on purpose.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 2]</code></pre>
+  </figure>
+  <figure class="code out fail">
+    <figcaption><span>Console</span></figcaption>
+<pre>Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+    assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 2]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError</pre>
+  </figure>
+
+  <p>The last line is the one that matters: <code>AssertionError</code> means the condition was false. Python points at the line, but it does not show you the two values that disagreed. To see them, run the left side by itself.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>rescale01(pd.Series([0, 5, 10])).tolist()</code></pre>
+  </figure>
+  <figure class="code out">
+    <figcaption><span>Console</span></figcaption>
+<pre>[0.0, 0.5, 1.0]</pre>
+  </figure>
+
+  <p>The third element was 1.0 and you said 2. Put the 1 back and the assertion is silent again. Having to dig for the values is a nuisance, and <a href="0002-test-functions-and-test-files.html">Lesson 2</a> removes it: the test runner pytest prints both sides for you.</p>
+  <span class="cite">Output shown is from the Python 3.14.4 console. A notebook lays the same error out differently; the last line is the same.</span>
+
+  <h2>Equal, or close enough?</h2>
+  <p>Computers store most decimal numbers approximately, which leads to a famous surprise.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>0.1 + 0.2 == 0.3</code></pre>
+  </figure>
+  <figure class="code out">
+    <figcaption><span>Console</span></figcaption>
+<pre>False</pre>
+  </figure>
+
+  <p>The same thing happens to your own functions. Rescaling 0.1, 0.2 and 0.3 should put the middle value at exactly one half.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>rescale01(pd.Series([0.1, 0.2, 0.3])).tolist()</code></pre>
+  </figure>
+  <figure class="code out">
+    <figcaption><span>Console</span></figcaption>
+<pre>[0.0, 0.5000000000000001, 1.0]</pre>
+  </figure>
+
+  <p>An assertion that compared this with <code>[0, 0.5, 1]</code> using a bare <code>==</code> would fail for a reason that has nothing to do with a bug. The testing package <a href="https://docs.pytest.org/">pytest</a>, which nearly everyone uses in Python, has the remedy. Install it once from a terminal, then import it.</p>
+
+  <figure class="code sh">
+    <figcaption><span>Terminal</span></figcaption>
+<pre><code>python -m pip install pytest pandas    # once per environment</code></pre>
+  </figure>
+
+  <p>Wrap the expected value in <code>pytest.approx()</code> and <code>==</code> ignores tiny floating-point differences (by default, anything smaller than one part in a million of the expected value).</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>import pytest
+
+assert rescale01(pd.Series([0.1, 0.2, 0.3])).tolist() == pytest.approx([0, 0.5, 1])   # silent: passes
+assert rescale01(pd.Series([0.1, 0.2, 0.3])).tolist() == [0, 0.5, 1]                  # fails</code></pre>
+  </figure>
+  <figure class="code out fail">
+    <figcaption><span>Console</span></figcaption>
+<pre>Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+    assert rescale01(pd.Series([0.1, 0.2, 0.3])).tolist() == [0, 0.5, 1]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError</pre>
+  </figure>
+  <span class="cite">“By default, <code>approx</code> considers numbers within a relative tolerance of <code>1e-6</code> (i.e. one part in a million) of its expected value to be equal.” <a href="https://docs.pytest.org/en/stable/reference/reference.html#pytest.approx"><code>pytest.approx()</code> reference</a>. Why decimals are approximate: <a href="https://docs.python.org/3/tutorial/floatingpoint.html">Python tutorial, “Floating-Point Arithmetic”</a>.</span>
+
+  <p>Use plain <code>==</code> for text, whole numbers and anything that must match exactly, and <code>== pytest.approx(…)</code> when the result is the outcome of arithmetic on decimals. Plain <code>==</code> is not fussy about one thing: it treats the whole number <code>1</code> and the decimal <code>1.0</code> as equal, which is why <code>[0.0, 0.5, 1.0] == [0, 0.5, 1]</code> is true.</p>
+
+  <h2>Try it</h2>
+  <p>Open a Python console or a notebook and do these. Work out each expected value in your head or on paper <em>before</em> you run anything; that is the whole point.</p>
+  <ol class="steps">
+    <li>Define <code>rescale01()</code> from the top of this page, and import pandas and pytest.</li>
+    <li>Write an assertion for <code>rescale01(pd.Series([-2, 0, 2]))</code>. It should be silent.</li>
+    <li>Write one for <code>rescale01(pd.Series([10, 20, 30, 50]))</code>. If it fails, run the left side by itself, compare, and decide who is wrong: the function, or your arithmetic.</li>
+    <li>Break one of your assertions on purpose, read the error, and repair it.</li>
+    <li>Write one for <code>rescale01(pd.Series([0.2, 0.4, 0.6]))</code>, first with a bare <code>==</code> and then with <code>pytest.approx()</code>. Say which one passes before you run each.</li>
+  </ol>
+
+  <h2>Check yourself</h2>
+  <p>Answer from memory, without scrolling up. Getting one wrong and reading why is worth more than getting it right by looking.</p>
+
+  <section class="quiz" data-quiz="lesson-1" aria-label="Lesson 1 quiz">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">You run an <code>assert</code> statement at the console and Python prints nothing at all. What happened?</p>
+        <ul class="opts">
+          <li data-correct>The assertion passed without complaint.</li>
+          <li>The assertion was skipped entirely.</li>
+          <li>The assertion failed without output.</li>
+          <li>The assertion never actually ran.</li>
+        </ul>
+        <p class="why">A passing assertion is silent. Only a failure prints anything: a traceback that ends in <code>AssertionError</code>.</p>
+      </li>
+      <li class="q">
+        <p class="stem">In <code>assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 1]</code>, what is on the right of <code>==</code>?</p>
+        <ul class="opts">
+          <li data-correct>The right answer, which you supplied yourself.</li>
+          <li>The value your function has actually returned.</li>
+          <li>The biggest numeric gap Python will allow.</li>
+          <li>The message printed when the check fails.</li>
+        </ul>
+        <p class="why">The left side is the actual result (a call to your function). The right side is the expected result, which comes from you.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Why does <code>assert 0.1 + 0.2 == pytest.approx(0.3)</code> pass even though <code>0.1 + 0.2 == 0.3</code> is <code>False</code>?</p>
+        <ul class="opts">
+          <li data-correct>It ignores very tiny differences by default.</li>
+          <li>It rounds both values to two decimals.</li>
+          <li>It converts both values into character strings.</li>
+          <li>It only compares the types of values.</li>
+        </ul>
+        <p class="why"><code>pytest.approx()</code> gives <code>==</code> a small numeric tolerance. A bare <code>==</code> has none, so it fails here.</p>
+      </li>
+      <li class="q">
+        <p class="stem">What does writing a check as an assertion give you that looking at console output does not?</p>
+        <ul class="opts">
+          <li data-correct>It can be rerun after every change.</li>
+          <li>It makes the function run noticeably faster.</li>
+          <li>It removes any need for reading documentation.</li>
+          <li>It guarantees the function has no bugs.</li>
+        </ul>
+        <p class="why">A written check is repeatable. It makes bugs less likely, not impossible: a test only covers the cases you thought to write.</p>
+      </li>
+    </ol>
+  </section>
+
+  <div class="box source">
+    <span class="label">Read next (primary source)</span>
+    <p><a href="https://docs.pytest.org/en/stable/getting-started.html">pytest, “Get Started”</a>, the sections “Create your first test” and “Compare floating-point values with pytest.approx”. It is written by the people who maintain pytest. It puts the assertion in a test file straight away, which we reach in <a href="0002-test-functions-and-test-files.html">Lesson 2</a>.</p>
+  </div>
+
+  <div class="box ask">
+    <span class="label">Stuck or curious?</span>
+    <p>Ask. Bring the exact code and the exact message to your instructor, your classmates, or an AI assistant, and ask why it behaves that way. A question asked while you are confused teaches more than a page read while you are not.</p>
+  </div>
+
+  <nav class="pager" aria-label="Lesson">
+    <a href="../index.html">← Course home</a>
+    <a class="next" href="0002-test-functions-and-test-files.html">Lesson 2: Test functions and test files →</a>
+  </nav>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Code on this page was run with Python 3.14.4, pandas 3.1.1 and pytest 9.2.0.</p>
+</main>
+</body>
+</html>

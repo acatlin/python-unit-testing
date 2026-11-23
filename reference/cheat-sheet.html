@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cheat sheet · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="../lessons/0001-first-assertion.html">1 Assertions</a>
+    <a href="../lessons/0002-test-functions-and-test-files.html">2 Test files</a>
+    <a href="../lessons/0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="../lessons/0004-edge-cases-errors-and-bugs.html">4 Edge cases</a>
+    <a href="../lessons/0005-from-project-to-package.html">5 Packages</a>
+    <a href="cheat-sheet.html" aria-current="page">Cheat sheet</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="mastery-objectives.html">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Reference · prints on two pages</p>
+  <h1>pytest cheat sheet</h1>
+  <p class="lede">Everything from the five lessons, compressed. Terms are defined in the <a href="glossary.html">glossary</a>.</p>
+
+  <h2>Anatomy of a test</h2>
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>import pandas as pd
+
+from clean import rescale01   # in a package: from cleaner.clean import rescale01
+
+
+def test_rescale01_maps_smallest_to_0_and_largest_to_1():
+    assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 1]
+    #      actual: call your function                   expected: typed by hand</code></pre>
+  </figure>
+  <p>Assertions are grouped into tests; tests are organised in files. A passing assertion is silent. (<a href="../lessons/0001-first-assertion.html">Lesson 1</a>, <a href="../lessons/0002-test-functions-and-test-files.html">Lesson 2</a>)</p>
+
+  <h2>Assertions</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th>To check</th><th>Use</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Value, exactly</td><td><code>assert actual == expected</code></td><td>Lists, text, whole numbers. <code>1</code> and <code>1.0</code> count as equal.</td></tr>
+      <tr><td>Decimal numbers</td><td><code>assert actual == pytest.approx(expected)</code></td><td>Ignores tiny floating-point differences. Works on single numbers and on lists.</td></tr>
+      <tr><td>A whole column</td><td><code>pd.testing.assert_series_equal(actual, expected)</code></td><td>Never <code>assert a == b</code> on two Series. Missing values in the same place match.</td></tr>
+      <tr><td>A whole data frame</td><td><code>pd.testing.assert_frame_equal(actual, expected)</code></td><td>Dtypes must match: type <code>15.0</code>, not <code>15</code>, or pass <code>check_dtype=False</code>.</td></tr>
+      <tr><td>Length</td><td><code>assert len(x) == n</code></td><td></td></tr>
+      <tr><td>Dtype of a column</td><td><code>assert x.dtype == "float64"</code></td><td><code>"int64"</code>, <code>"bool"</code>…</td></tr>
+      <tr><td>Type</td><td><code>assert isinstance(x, pd.DataFrame)</code></td><td><code>pd.Series</code>, <code>list</code>, <code>dict</code>…</td></tr>
+      <tr><td>Column names</td><td><code>assert list(x.columns) == ["a", "b"]</code></td><td></td></tr>
+      <tr><td>Same values, any order</td><td><code>assert set(x) == {"b", "a"}</code></td><td></td></tr>
+      <tr><td>Text matches a pattern</td><td><code>assert re.fullmatch(r"pattern", text)</code></td><td>Needs <code>import re</code>.</td></tr>
+      <tr><td>Below / above a bound</td><td><code>assert x.max() &lt;= 1</code></td><td><code>&lt;</code> <code>&lt;=</code> <code>&gt;</code> <code>&gt;=</code></td></tr>
+      <tr><td>Any other condition</td><td><code>assert condition</code> <code>assert not condition</code></td><td>pytest shows the values inside the condition when it fails.</td></tr>
+      <tr><td>An error is raised</td><td><code>with pytest.raises(TypeError, match="text"):</code></td><td>Name the specific type and give <code>match</code>; <code>pytest.raises(Exception)</code> accepts any error, including typos.</td></tr>
+      <tr><td>A warning is raised</td><td><code>with pytest.warns(UserWarning, match="text"):</code></td><td></td></tr>
+      <tr><td>No warning</td><td><code>with warnings.catch_warnings():</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;warnings.simplefilter("error")</code></td><td>Needs <code>import warnings</code>. Any warning inside the block fails the test.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>(<a href="../lessons/0003-choosing-assertions.html">Lesson 3</a>, <a href="../lessons/0004-edge-cases-errors-and-bugs.html">Lesson 4</a>. More: <a href="https://docs.pytest.org/en/stable/how-to/assert.html">pytest on assertions</a>, <a href="https://pandas.pydata.org/docs/reference/testing.html">pandas testing reference</a>.)</p>
+
+  <h2>Layout and running</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>Plain project</th><th>Package</th></tr></thead>
+    <tbody>
+      <tr><td>Functions</td><td><code>clean.py</code></td><td><code>src/cleaner/clean.py</code>, beside an empty <code>__init__.py</code></td></tr>
+      <tr><td>Tests</td><td><code>tests/test_clean.py</code></td><td>Same</td></tr>
+      <tr><td>Import in the tests</td><td><code>from clean import rescale01</code></td><td><code>from cleaner.clean import rescale01</code></td></tr>
+      <tr><td>Set-up, once</td><td>Create the folder and files by hand</td><td>Write <code>pyproject.toml</code>, activate a virtual environment, then <code>python -m pip install -e . --group dev</code></td></tr>
+      <tr><td>Run all tests</td><td><code>python -m pytest</code>, from the project folder</td><td><code>pytest</code></td></tr>
+      <tr><td>Run one file</td><td><code>python -m pytest tests/test_clean.py</code></td><td><code>pytest tests/test_clean.py</code></td></tr>
+      <tr><td>Run tests by name</td><td><code>python -m pytest -k rescale01</code></td><td><code>pytest -k rescale01</code></td></tr>
+      <tr><td>Other packages</td><td>Install them yourself</td><td><code>dependencies</code> for what the functions need; <code>[dependency-groups]</code> for what only the tests need</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Test file names must start with <code>test_</code> and end with <code>.py</code>; test function names must start with <code>test</code>. Useful switches: <code>-v</code> lists every test, <code>-x</code> stops at the first failure, <code>--lf</code> reruns only the tests that failed last time. (<a href="../lessons/0002-test-functions-and-test-files.html">Lesson 2</a>, <a href="../lessons/0005-from-project-to-package.html">Lesson 5</a>)</p>
+
+  <h2>Reading the report</h2>
+  <figure class="code out">
+    <figcaption><span>Terminal</span></figcaption>
+<pre>tests\test_clean.py .F.                                     one dot or F per test
+___ test_clean_names_returns_lower_case_snake_case ___      what: the test's name
+&gt;       assert clean_names([...]) == ["total", "zip-code"]  where: the line
+E       AssertionError: assert ['total', 'zip_code'] == ['total', 'zip-code']
+E         At index 1 diff: 'zip_code' != 'zip-code'         why: actual, expected
+
+tests\test_clean.py:13: AssertionError                      where: file and line
+
+========== 1 failed, 2 passed in 2.63s ==========           tests, not assertions</pre>
+  </figure>
+  <p>Then decide which side is wrong: the function or the test. A test stops at its first failing assertion. <code>ModuleNotFoundError: No module named 'clean'</code> means Python could not find your functions: run <code>python -m pytest</code> from the project folder, or in a package, activate the environment and install.</p>
+
+  <h2>Habits</h2>
+  <ul>
+    <li><strong>Work out the expected value yourself.</strong> Never compute it by calling the function under test.</li>
+    <li><strong>Small inputs.</strong> Three rows you can check in your head are worth more than three thousand you cannot.</li>
+    <li><strong>One behaviour per test</strong>, with a name that says what should happen and that no other test shares.</li>
+    <li><strong>Each test builds what it needs.</strong> No test depends on another.</li>
+    <li><strong>Walk the edge cases:</strong> missing values, all values the same, a single value, empty input, the wrong type.</li>
+    <li><strong>Bug found? Test first.</strong> Write a test that fails, fix the code, run <em>all</em> the tests.</li>
+    <li><strong>Prefer the specific check</strong> to <code>.equals()</code> or <code>pytest.raises(Exception)</code>.</li>
+    <li><strong>See every test fail once.</strong> A test that has never failed has not shown it can.</li>
+  </ul>
+
+  <p class="colophon">Sources: <a href="https://docs.pytest.org/en/stable/how-to/assert.html">pytest, “How to write and report assertions in tests”</a> and <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html">“Good Integration Practices”</a>; <a href="https://pandas.pydata.org/docs/reference/testing.html">pandas testing reference</a>; <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide</a>. Checked against pytest 9.2.0 and pandas 3.1.1. The report above is shortened and annotated.</p>
+</main>
+</body>
+</html>

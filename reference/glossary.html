@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="../lessons/0001-first-assertion.html">1 Assertions</a>
+    <a href="../lessons/0002-test-functions-and-test-files.html">2 Test files</a>
+    <a href="../lessons/0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="../lessons/0004-edge-cases-errors-and-bugs.html">4 Edge cases</a>
+    <a href="../lessons/0005-from-project-to-package.html">5 Packages</a>
+    <a href="cheat-sheet.html">Cheat sheet</a>
+    <a href="glossary.html" aria-current="page">Glossary</a>
+    <a href="mastery-objectives.html">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Reference</p>
+  <h1>Glossary</h1>
+  <p class="lede">The course's vocabulary. Each term is used in exactly this sense on every page.</p>
+
+  <dl class="glossary">
+    <dt id="actual">Actual</dt>
+    <dd>What your code really returned. In <code>assert actual == expected</code> it goes on the left; in the pandas comparison functions it is the first argument, reported as <code>[left]</code>. <span class="where">Lessons 1, 3</span></dd>
+
+    <dt id="assertion">Assertion</dt>
+    <dd>A single check. Usually one <code>assert</code> statement; also one call to a helper such as <code>pd.testing.assert_frame_equal()</code>, or one <code>pytest.raises()</code> block. It is silent when it passes and raises an error when it does not. <span class="where">Lesson 1</span></dd>
+
+    <dt id="collection">Collection</dt>
+    <dd>The first thing pytest does in a run: it searches for test files and gathers the tests inside them. The report line <code>collected 3 items</code> says how many it found. <span class="where">Lesson 2</span></dd>
+
+    <dt id="dependency">Dependency</dt>
+    <dd>Another package that yours needs. Packages your functions need are listed under <code>dependencies</code> in <code>pyproject.toml</code>; packages only your tests need go in a dependency group. <span class="where">Lesson 5</span></dd>
+
+    <dt id="edge-case">Edge case</dt>
+    <dd>An input at the boundary of what a function was written for: missing values, an empty column, a constant column, the wrong type. <span class="where">Lesson 4</span></dd>
+
+    <dt id="editable-install">Editable install</dt>
+    <dd>Installing your own package with <code>pip install -e .</code>, so that Python imports it straight from your project folder and every edit takes effect without reinstalling. <span class="where">Lesson 5</span></dd>
+
+    <dt id="expected">Expected</dt>
+    <dd>What the code should return, worked out by you and typed into the test. In <code>assert actual == expected</code> it goes on the right; in the pandas comparison functions it is the second argument, reported as <code>[right]</code>. <span class="where">Lessons 1, 3</span></dd>
+
+    <dt id="failure">Failure</dt>
+    <dd>A test in which an assertion did not hold. Either the code or the test is wrong; the report helps you decide which. Counted as <code>failed</code> on the last line of the report. <span class="where">Lessons 1, 2</span></dd>
+
+    <dt id="happy-path">Happy path</dt>
+    <dd>Ordinary, well-formed input producing an ordinary result. The first thing to test, never the only thing. <span class="where">Lesson 4</span></dd>
+
+    <dt id="package">Package</dt>
+    <dd>Python's standard way to bundle functions and their settings in one folder with a fixed layout, so that the code can be installed and then imported from anywhere. <span class="where">Lesson 5</span></dd>
+
+    <dt id="pyproject"><code>pyproject.toml</code></dt>
+    <dd>The settings file at the top of a package. It gives the package's name, lists the packages it depends on, and holds pytest's settings. <span class="where">Lesson 5</span></dd>
+
+    <dt id="pytest">pytest</dt>
+    <dd>The Python package this course uses for unit testing. It finds your tests, runs them, and reports what happened. <span class="where">Lessons 1, 2</span></dd>
+
+    <dt id="regular-expression">Regular expression</dt>
+    <dd>A text pattern. The <code>match</code> argument of <code>pytest.raises()</code> and <code>pytest.warns()</code> takes one and checks that the message contains it; <code>re.fullmatch()</code> checks a whole string against one. A plain phrase such as <code>"must be a numeric column"</code> is the simplest kind. <span class="where">Lessons 3, 4</span></dd>
+
+    <dt id="test">Test</dt>
+    <dd>One function whose name starts with <code>test</code>, holding one or more assertions about a single behaviour. <span class="where">Lesson 2</span></dd>
+
+    <dt id="test-file">Test file</dt>
+    <dd>A Python file in <code>tests/</code> whose name starts with <code>test_</code>. It holds the tests for one file of functions. <span class="where">Lesson 2</span></dd>
+
+    <dt id="test-name">Test name</dt>
+    <dd>The name of a test function, written so that it says what the code should do. It is printed when the test fails. <span class="where">Lesson 2</span></dd>
+
+    <dt id="tolerance">Tolerance</dt>
+    <dd>The small numeric difference that <code>pytest.approx()</code> and the pandas comparison functions ignore, so that floating-point noise does not cause failures. A bare <code>==</code> has none. <span class="where">Lessons 1, 3</span></dd>
+
+    <dt id="unit-test">Unit test</dt>
+    <dd>A check, written as code, that one small piece of a program (usually one function) behaves as intended. <span class="where">Lesson 1</span></dd>
+
+    <dt id="virtual-environment">Virtual environment</dt>
+    <dd>A private set of installed packages for one project, kept in a folder such as <code>.venv/</code>. It has to be activated in each new terminal. <span class="where">Lesson 5</span></dd>
+  </dl>
+
+  <p class="colophon">Definitions follow the usage in the <a href="https://docs.pytest.org/en/stable/">pytest documentation</a> and the <a href="https://packaging.python.org/en/latest/">Python Packaging User Guide</a>. See also the <a href="cheat-sheet.html">cheat sheet</a>.</p>
+</main>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 4: Edge cases, errors and bugs · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="0001-first-assertion.html">1 Assertions</a>
+    <a href="0002-test-functions-and-test-files.html">2 Test files</a>
+    <a href="0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="0004-edge-cases-errors-and-bugs.html" aria-current="page">4 Edge cases</a>
+    <a href="0005-from-project-to-package.html">5 Packages</a>
+    <a href="../reference/cheat-sheet.html">Cheat sheet</a>
+    <a href="../reference/glossary.html">Glossary</a>
+    <a href="../reference/mastery-objectives.html">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Lesson 4 of 5 · about 30 minutes</p>
+  <h1>Edge cases, errors and bugs</h1>
+  <p class="lede">Every test so far fed a function tidy input and checked a tidy answer. Real data is not tidy. This lesson is about the inputs that break things, and a habit that keeps a bug from coming back once you have fixed it.</p>
+
+  <div class="win">
+    <span class="label">By the end you can</span>
+    <p>Find a real bug in <code>rescale01()</code>, pin it down with a failing test, fix it, and watch the test pass.</p>
+  </div>
+
+  <h2>From last time</h2>
+  <section class="quiz" aria-label="Warm-up">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">Which call compares two data frames and reports where they differ?</p>
+        <ul class="opts">
+          <li data-correct><code>pd.testing.assert_frame_equal()</code></li>
+          <li><code>pd.testing.assert_index_equal()</code></li>
+          <li><code>pd.testing.assert_series_equal()</code></li>
+          <li><code>pd.DataFrame.equals()</code></li>
+        </ul>
+        <p class="why"><code>assert_series_equal()</code> is for a single column and <code>assert_index_equal()</code> for row or column labels. <code>.equals()</code> does compare data frames, but all it reports is <code>False</code>.</p>
+      </li>
+      <li class="q">
+        <p class="stem">In a plain project, which command lets the tests import <code>clean.py</code>?</p>
+        <ul class="opts">
+          <li data-correct><code>python -m pytest</code></li>
+          <li><code>python -m clean</code></li>
+          <li><code>python -m tests</code></li>
+          <li><code>pytest --import clean</code></li>
+        </ul>
+        <p class="why">Run from the project folder, <code>python -m pytest</code> puts that folder on Python's search path; plain <code>pytest</code> stops with <code>ModuleNotFoundError</code>.</p>
+      </li>
+    </ol>
+  </section>
+
+  <h2>Ask what could go wrong</h2>
+  <p>The tests you have written cover the <a href="../reference/glossary.html#happy-path">happy path</a>: ordinary input, ordinary output. Bugs mostly live elsewhere. For a function that takes a column of data, run through this list and ask of each item, “what <em>should</em> happen?”</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Edge case</th><th>Example input</th></tr></thead>
+    <tbody>
+      <tr><td>Missing values</td><td><code>pd.Series([1, None, 3])</code></td></tr>
+      <tr><td>Every value the same</td><td><code>pd.Series([5, 5, 5])</code></td></tr>
+      <tr><td>A single value</td><td><code>pd.Series([7])</code></td></tr>
+      <tr><td>Nothing at all</td><td><code>pd.Series([], dtype="float64")</code></td></tr>
+      <tr><td>The wrong type</td><td><code>pd.Series(["a", "b"])</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Deciding the answer is design work, and the test is where you record the decision. For missing values in <code>rescale01()</code>, a reasonable decision is “they stay missing, and the rest are rescaled as usual”:</p>
+
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>def test_rescale01_keeps_missing_values_missing():
+    result = rescale01(pd.Series([1, None, 3]))
+    expected = pd.Series([0, None, 1])
+    pd.testing.assert_series_equal(result, expected)</code></pre>
+  </figure>
+
+  <p>This is a job for <code>assert_series_equal()</code>, not for <code>.tolist()</code> and <code>==</code>. pandas stores a missing number as <code>NaN</code>, and <code>NaN</code> is not equal to anything, itself included, so a list containing one can never pass an <code>==</code> check. <code>assert_series_equal()</code> counts two missing values in the same position as a match.</p>
+  <span class="cite"><code>np.nan == np.nan</code> is <code>False</code>: <a href="https://pandas.pydata.org/docs/user_guide/missing_data.html">pandas user guide, “Working with missing data”</a>. The behaviour of <code>assert_series_equal()</code> with missing values was checked by running it.</span>
+
+  <p>The test passes already. That is a fine outcome: the behaviour is now written down, and a future edit that changes how missing values are handled will be caught.</p>
+
+  <h2>A bug, caught test-first</h2>
+  <p>Now the second item on the list. What does <code>rescale01()</code> do with a column where every value is the same?</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>rescale01(pd.Series([5, 5, 5]))</code></pre>
+  </figure>
+  <figure class="code out fail">
+    <figcaption><span>Console</span></figcaption>
+<pre>0   NaN
+1   NaN
+2   NaN
+dtype: float64</pre>
+  </figure>
+
+  <p>The smallest and largest values are equal, so the function divides zero by zero. pandas does not raise an error for that; it returns <code>NaN</code>. One constant column would quietly fill a model matrix with missing values. That is a bug. The tempting move is to fix it straight away. Do this instead:</p>
+
+  <blockquote>So, before actually writing any code, you should write your tests.
+    <footer>pandas contributing guide, <a href="https://pandas.pydata.org/docs/development/contributing_codebase.html#test-driven-development">“Test-driven development”</a></footer>
+  </blockquote>
+
+  <h3>Step 1: write the test and watch it fail</h3>
+  <p>Decide what should happen (all zeros is a sensible answer) and say so.</p>
+
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>def test_rescale01_returns_zeros_when_every_value_is_the_same():
+    assert rescale01(pd.Series([5, 5, 5])).tolist() == [0, 0, 0]</code></pre>
+  </figure>
+  <figure class="code out fail">
+    <figcaption><span>Terminal</span></figcaption>
+<pre>__________ test_rescale01_returns_zeros_when_every_value_is_the_same __________
+
+    def test_rescale01_returns_zeros_when_every_value_is_the_same():
+&gt;       assert rescale01(pd.Series([5, 5, 5])).tolist() == [0, 0, 0]
+E       assert [nan, nan, nan] == [0, 0, 0]
+E
+E         At index 0 diff: nan != 0
+E         Use -v to get more diff
+
+tests\test_clean.py:55: AssertionError</pre>
+  </figure>
+
+  <p>The failure matters. It proves that the test can see this bug. A test written after the fix passes the first time you run it, and you never find out whether it would have caught anything.</p>
+  <span class="cite">“Check that your test fails when it should!” <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide, “Testing recommendations”</a>.</span>
+
+  <h3>Step 2: fix the function</h3>
+  <figure class="code py">
+    <figcaption><span>clean.py</span></figcaption>
+<pre><code>def rescale01(x):
+    """Rescale a numeric column so its smallest value is 0 and its largest is 1."""
+    lo, hi = x.min(), x.max()
+    if lo == hi:
+        return x * 0.0  # every value is the same: all zeros, missing kept
+    return (x - lo) / (hi - lo)</code></pre>
+  </figure>
+
+  <h3>Step 3: run everything again</h3>
+  <p>Run all the tests, not just the new one. The new test should pass, and so should every old one. The old ones are how you know the fix did not break something else.</p>
+  <span class="cite">This fail-first rhythm is often called “red, green”. The pandas guide describes it as writing “an (initially failing) automated test case” and then “the minimum amount of code to pass that test”.</span>
+
+  <h2>Expecting an error</h2>
+  <p>For the wrong type, the right behaviour is to stop with a clear message. <code>pytest.raises()</code> wraps a block of code. The test passes when the block raises the kind of error you named and fails when it does not.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python, inside a test</span></figcaption>
+<pre><code>with pytest.raises(Exception):
+    rescale01(pd.Series(["a", "b"]))</code></pre>
+  </figure>
+
+  <p>This passes with the function as it stands, which looks like good news. It is not, quite. Look at what the next version does, with the function name mistyped:</p>
+
+  <figure class="code py">
+    <figcaption><span>Python, inside a test</span></figcaption>
+<pre><code>with pytest.raises(Exception):
+    rescale1(pd.Series(["a", "b"]))   # typo: there is no function rescale1()</code></pre>
+  </figure>
+
+  <div class="box trap">
+    <span class="label">Common trap</span>
+    <p>That also passes. <code>NameError: name 'rescale1' is not defined</code> is an error, and <code>Exception</code> is the family that nearly every Python error belongs to, so <code>pytest.raises(Exception)</code> is satisfied by <em>any</em> error at all. A test like this can stay green for years while testing nothing.</p>
+  </div>
+  <span class="cite">“Because <code>Exception</code> is the base class of almost all exceptions, it is easy for this to hide real bugs”. <a href="https://docs.pytest.org/en/stable/reference/reference.html#pytest.raises"><code>pytest.raises()</code> reference</a>.</span>
+
+  <p>Say which error you mean, in two ways. Name the specific type of exception, and give <code>match</code> a piece of text (a <a href="../reference/glossary.html#regular-expression">regular expression</a>) that the error message must contain.</p>
+
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>def test_rescale01_rejects_a_column_that_is_not_numeric():
+    with pytest.raises(TypeError, match="must be a numeric column"):
+        rescale01(pd.Series(["a", "b"]))</code></pre>
+  </figure>
+  <figure class="code out fail">
+    <figcaption><span>pytest report (the lines marked E)</span></figcaption>
+<pre>E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'must be a numeric column'
+E         Actual message: "unsupported operand type(s) for -: 'str' and 'str'"</pre>
+  </figure>
+  <span class="cite"><code>match</code>: “a string containing a regular expression… that is tested against the string representation of the exception”. <a href="https://docs.pytest.org/en/stable/how-to/assert.html#matching-exception-messages">pytest, “Matching exception messages”</a>. The test file now needs <code>import pytest</code> at the top.</span>
+
+  <p>Now the test shows what a user of the function would see: an error of the right type, but a cryptic one from deep inside the arithmetic. The test is red, so improve the function by checking the input at the top:</p>
+
+  <figure class="code py">
+    <figcaption><span>clean.py</span></figcaption>
+<pre><code>def rescale01(x):
+    """Rescale a numeric column so its smallest value is 0 and its largest is 1."""
+    if not pd.api.types.is_numeric_dtype(x):
+        raise TypeError("x must be a numeric column")
+    lo, hi = x.min(), x.max()
+    if lo == hi:
+        return x * 0.0  # every value is the same: all zeros, missing kept
+    return (x - lo) / (hi - lo)</code></pre>
+  </figure>
+
+  <p>Run the tests again and everything passes. The same failing-test-first rhythm fixed a bug a moment ago and has now added a feature.</p>
+
+  <h2>Warnings</h2>
+  <p><code>parse_money(pd.Series(["n/a"]))</code> returns a missing value and warns <code>1 value(s) could not be parsed as money</code>. If that is the behaviour you want, say so with <code>pytest.warns()</code>, which works like <code>pytest.raises()</code>. To state that well-formed input is quiet, turn warnings into errors for the length of the test, so that any warning fails it.</p>
+
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>def test_parse_money_warns_when_a_value_cannot_be_parsed():
+    with pytest.warns(UserWarning, match="could not be parsed"):
+        parse_money(pd.Series(["n/a"]))
+
+
+def test_parse_money_is_quiet_when_every_value_parses():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        parse_money(pd.Series(["$5"]))</code></pre>
+  </figure>
+  <span class="cite">“To ensure that no warnings are emitted, use” <code>warnings.catch_warnings()</code> with <code>warnings.simplefilter("error")</code>. <a href="https://docs.pytest.org/en/stable/how-to/capture-warnings.html#additional-use-cases-of-warnings-in-tests">pytest, “How to capture warnings”</a>. The test file needs <code>import warnings</code> at the top.</span>
+
+  <p>A warning that no test asked for does not fail the test, but it is not hidden either. pytest lists it under a <code>warnings summary</code> heading and counts it on the last line of the report:</p>
+
+  <figure class="code out">
+    <figcaption><span>Terminal (last lines), with one test that calls parse_money(pd.Series(["n/a"])) outside pytest.warns()</span></figcaption>
+<pre>============================== warnings summary ===============================
+tests/test_demo.py::test_parse_money_turns_junk_into_missing
+  C:\Users\you\cleaning-project\tests\test_demo.py:7: UserWarning: 1 value(s) could not be parsed as money
+    assert parse_money(pd.Series(["n/a"])).isna().all()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 10 passed, 1 warning in 2.51s ========================</pre>
+  </figure>
+
+  <p>Treat a warning count on the last line as something to investigate.</p>
+
+  <h2>One behaviour per test</h2>
+  <p>Your test file now has several short tests for <code>rescale01()</code> rather than one long one. Keep it that way. When the constant-column test fails, its name tells you what broke before you read a line of code, and because a test stops at its first failing assertion, short tests hide less.</p>
+  <span class="cite">“Test one thing at a time: A single test should test a single behavior, and it is better to write many test cases for a single function or class, than one giant case.” <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide</a>.</span>
+
+  <p>Give every test a name of its own. If two functions in one file share a name, Python keeps only the second, and pytest never sees the first.</p>
+
+  <h2>Try it</h2>
+  <ol class="steps">
+    <li>Starting from your Lesson 3 project, work through this page in order: add each test, see it fail where the page says it fails, and make the two changes to <code>rescale01()</code>. Finish with every test passing. You can compare with the <a href="https://github.com/acatlin/python-unit-testing/tree/main/examples/cleaning-project">finished project</a> (12 tests).</li>
+    <li>What should <code>rescale01(pd.Series([7]))</code>, a single value, return? Decide, write the test, and run it.</li>
+    <li>What does <code>clean_names()</code> do with <code>[""]</code>, with <code>["123 Go!"]</code>, or with a bare string such as <code>"First Name"</code> in place of a list? Try them in the console, decide whether you are happy with each result, and write a test that records your decision.</li>
+  </ol>
+
+  <h2>Check yourself</h2>
+  <section class="quiz" data-quiz="lesson-4" aria-label="Lesson 4 quiz">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">A test wraps <code>rescale1(pd.Series(["a"]))</code> in <code>with pytest.raises(Exception):</code>, where the function name is a typo. What happens when it runs?</p>
+        <ul class="opts">
+          <li data-correct>It passes, since any error satisfies it.</li>
+          <li>It fails, since the function is missing.</li>
+          <li>It is skipped, since nothing was called.</li>
+          <li>It warns, since the name looks wrong.</li>
+        </ul>
+        <p class="why"><code>NameError</code> is itself an exception, and <code>pytest.raises(Exception)</code> accepts any exception.</p>
+      </li>
+      <li class="q">
+        <p class="stem">How do you make sure <code>pytest.raises()</code> saw the error you intended?</p>
+        <ul class="opts">
+          <li data-correct>Give the exception type and a <code>match</code>.</li>
+          <li>Wrap the block inside another test function.</li>
+          <li>Call the function twice inside the block.</li>
+          <li>Put a plain <code>assert</code> around the call.</li>
+        </ul>
+        <p class="why">Name the specific type and add a pattern for the message, as in <code>pytest.raises(TypeError, match="must be a numeric column")</code>.</p>
+      </li>
+      <li class="q">
+        <p class="stem">You discover that <code>rescale01(pd.Series([5, 5, 5]))</code> returns <code>NaN</code>. What is the best first move?</p>
+        <ul class="opts">
+          <li data-correct>Write a new test that reproduces it.</li>
+          <li>Fix the function before you forget how.</li>
+          <li>Delete the tests that still pass now.</li>
+          <li>Note it in a comment for later.</li>
+        </ul>
+        <p class="why">A test that fails first proves it can detect the bug, and stays behind to stop the bug returning.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Which set of inputs covers the usual edge cases for a numeric helper?</p>
+        <ul class="opts">
+          <li data-correct>Missing values, identical values, and wrong types.</li>
+          <li>Three ordinary numeric columns of different lengths.</li>
+          <li>The same typical column, run three times.</li>
+          <li>Whatever values appeared in the last dataset.</li>
+        </ul>
+        <p class="why">Edge cases sit at the boundaries of what the function was written for. More ordinary input mostly re-tests the happy path.</p>
+      </li>
+      <li class="q">
+        <p class="stem">A test calls <code>parse_money(pd.Series(["n/a"]))</code> without using <code>pytest.warns()</code>. What does the run report?</p>
+        <ul class="opts">
+          <li data-correct>A pass, plus one warning in the summary.</li>
+          <li>A failure, with the warning as the reason.</li>
+          <li>A skip, with the warning as the reason.</li>
+          <li>A pass, with no mention of the warning.</li>
+        </ul>
+        <p class="why">Unexpected warnings are listed and counted (<code>1 warning</code> on the last line), but they do not make the test fail.</p>
+      </li>
+    </ol>
+  </section>
+
+  <div class="box source">
+    <span class="label">Read next (primary source)</span>
+    <p><a href="https://docs.pytest.org/en/stable/how-to/assert.html#assertions-about-expected-exceptions">pytest, “How to write and report assertions in tests”</a>, the sections “Assertions about expected exceptions” and “Matching exception messages”. They are short, and they are where the advice on <code>pytest.raises()</code> comes from.</p>
+  </div>
+
+  <div class="box ask">
+    <span class="label">Stuck or curious?</span>
+    <p>Ask. “What should this function do with an empty column?” often has no single right answer, which makes it a good thing to argue about with your instructor, a classmate, or an AI assistant.</p>
+  </div>
+
+  <nav class="pager" aria-label="Lesson">
+    <a href="0003-choosing-assertions.html">← Lesson 3: Choosing the right assertion</a>
+    <a class="next" href="0005-from-project-to-package.html">Lesson 5: From project to package →</a>
+  </nav>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.14.4 with pytest 9.2.0 and pandas 3.1.1; line numbers in reports depend on where you put each test, and the folder in the warning is shortened.</p>
+</main>
+</body>
+</html>

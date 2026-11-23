@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 2: Test functions and test files · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="0001-first-assertion.html">1 Assertions</a>
+    <a href="0002-test-functions-and-test-files.html" aria-current="page">2 Test files</a>
+    <a href="0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="0004-edge-cases-errors-and-bugs.html">4 Edge cases</a>
+    <a href="0005-from-project-to-package.html">5 Packages</a>
+    <a href="../reference/cheat-sheet.html">Cheat sheet</a>
+    <a href="../reference/glossary.html">Glossary</a>
+    <a href="../reference/mastery-objectives.html">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Lesson 2 of 5 · about 25 minutes</p>
+  <h1>Test functions and test files</h1>
+  <p class="lede">An assertion typed at the console is gone when you close Python. This lesson gives your assertions a name, a file, and one command that runs all of them.</p>
+
+  <div class="win">
+    <span class="label">By the end you can</span>
+    <p>Lay out a Python project with a <code>tests/</code> folder, run every test with one command, and read the report.</p>
+  </div>
+
+  <h2>From last time</h2>
+  <p>Two questions from <a href="0001-first-assertion.html">Lesson 1</a>. Answer before reading on; recalling is what makes it stick.</p>
+  <section class="quiz" aria-label="Warm-up">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">What does a passing <code>assert</code> statement print at the console?</p>
+        <ul class="opts">
+          <li data-correct>Nothing at all.</li>
+          <li>The word True.</li>
+          <li>A green tick.</li>
+          <li>The compared values.</li>
+        </ul>
+        <p class="why">Assertions are silent when they pass.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Which pytest helper makes <code>==</code> ignore tiny floating-point differences?</p>
+        <ul class="opts">
+          <li data-correct><code>pytest.approx()</code></li>
+          <li><code>pytest.equal()</code></li>
+          <li><code>pytest.close()</code></li>
+          <li><code>pytest.exact()</code></li>
+        </ul>
+        <p class="why">Wrap the expected value: <code>actual == pytest.approx(expected)</code>. A bare <code>==</code> has no tolerance. The other three do not exist.</p>
+      </li>
+    </ol>
+  </section>
+
+  <h2>Group assertions into a test</h2>
+  <p>A <a href="../reference/glossary.html#test">test</a> is a function whose name starts with <code>test</code>. It takes no arguments, returns nothing, and holds one or more assertions about a single behaviour.</p>
+
+  <figure class="code py">
+    <figcaption><span>Python</span></figcaption>
+<pre><code>def test_rescale01_maps_smallest_to_0_and_largest_to_1():
+    assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 1]
+    assert rescale01(pd.Series([-2, 0, 2])).tolist() == [0, 0.5, 1]</code></pre>
+  </figure>
+
+  <p>Defining the function runs nothing. You do not call it yourself either: pytest finds it by its name and calls it for you, as you will see below.</p>
+
+  <p>The <a href="../reference/glossary.html#test-name">name</a> is the description. When a test fails months from now, its name is the first thing you will read, so make it say what the function should do, not just the function's name. <code>test_rescale01</code> tells you where to look; <code>test_rescale01_maps_smallest_to_0_and_largest_to_1</code> tells you what broke. Long names are normal here, because nobody ever has to type them again.</p>
+  <span class="cite">pytest collects “<code>test</code> prefixed test functions or methods outside of class”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#conventions-for-python-test-discovery">pytest, “Conventions for Python test discovery”</a>. “Good tests make it clear what they are testing and how.” <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide</a>.</span>
+
+  <h2>Give tests a home</h2>
+  <p>Tests live in their own files, apart from the code they test. The layout below keeps the tests in a folder of their own, which pytest's documentation calls “often a good idea”, and it is the one Python packages use, so learning it now saves relearning it later.</p>
+
+<pre class="tree">cleaning-project/
+├── clean.py              your functions
+└── tests/
+    └── test_clean.py     tests for the functions in clean.py</pre>
+
+  <p>Two rules matter. pytest looks for files whose names start with <code>test_</code> and end with <code>.py</code>, and inside them for functions whose names start with <code>test</code>. A file called <code>clean_tests.py</code> is not treated as a test file, and a function called <code>check_rescale01()</code> is not treated as a test. pytest skips both without a word.</p>
+  <span class="cite">pytest will “search for <code>test_*.py</code> or <code>*_test.py</code> files”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#conventions-for-python-test-discovery">pytest, “Conventions for Python test discovery”</a>. The pairing <code>clean.py</code> ↔ <code>test_clean.py</code>: “Test files should be named <code>test_{file under test}.py</code>”, <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide</a>.</span>
+
+  <p>So there are three levels, each inside the next: <strong>assertions</strong> are grouped into <strong>tests</strong>, and tests are organised in <strong>files</strong>.</p>
+
+  <h2>The test file</h2>
+  <p>Here is <code>tests/test_clean.py</code>. It tests three small cleaning helpers that live in <code>clean.py</code>.</p>
+
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>import pandas as pd
+
+from clean import clean_names, parse_money, rescale01
+
+
+def test_rescale01_maps_smallest_to_0_and_largest_to_1():
+    assert rescale01(pd.Series([0, 5, 10])).tolist() == [0, 0.5, 1]
+    assert rescale01(pd.Series([-2, 0, 2])).tolist() == [0, 0.5, 1]
+
+
+def test_clean_names_returns_lower_case_snake_case():
+    assert clean_names(["First Name"]) == ["first_name"]
+    assert clean_names(["Total ($)", " Zip-Code "]) == ["total", "zip_code"]
+
+
+def test_parse_money_strips_dollar_signs_and_commas():
+    assert parse_money(pd.Series(["$1,200.50"])).tolist() == [1200.5]
+    assert parse_money(pd.Series(["75"])).tolist() == [75]</code></pre>
+  </figure>
+
+  <div class="box">
+    <span class="label">What is <code>from clean import …</code>?</span>
+    <p>A test file is an ordinary Python file, so it has to import everything it uses. That includes your own functions: the line <code>from clean import clean_names, parse_money, rescale01</code> fetches them from <code>clean.py</code>. Treat it as a line every test file starts with, and add to it when you test another function.</p>
+  </div>
+
+  <h2>Run everything</h2>
+  <p>Open a terminal in the project folder, the one that contains <code>clean.py</code>, and run one command.</p>
+
+  <figure class="code sh">
+    <figcaption><span>Terminal, in cleaning-project/</span></figcaption>
+<pre><code>python -m pytest</code></pre>
+  </figure>
+  <figure class="code out pass">
+    <figcaption><span>Terminal</span></figcaption>
+<pre>============================= test session starts =============================
+platform win32 -- Python 3.14.4, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\you\cleaning-project
+collected 3 items
+
+tests\test_clean.py ...                                                  [100%]
+
+============================== 3 passed in 2.39s ==============================</pre>
+  </figure>
+
+  <p>pytest searched the folder, found one test file and <a href="../reference/glossary.html#collection">collected</a> three tests from it. Each row is one test file, with one dot for each test that passed. Note what is being counted: 3 is the number of <em>tests</em>, not the number of assertions (6) or files (1).</p>
+
+  <p>Why <code>python -m pytest</code> and not just <code>pytest</code>? The test file says <code>from clean import …</code>, so Python has to know where <code>clean.py</code> is. Starting pytest through <code>python -m</code> adds the folder you are standing in to the places Python looks. In a plain project, that is your job; <a href="0005-from-project-to-package.html">Lesson 5</a> takes it away.</p>
+  <span class="cite">“This is almost equivalent to invoking the command line script <code>pytest [...]</code> directly, except that calling via <code>python</code> will also add the current directory to <code>sys.path</code>.” <a href="https://docs.pytest.org/en/stable/how-to/usage.html#calling-pytest-through-python-m-pytest">pytest, “How to invoke pytest”</a>.</span>
+
+  <p>Add <code>-v</code> (for verbose) and pytest lists every test by name. This is where good names start to pay.</p>
+
+  <figure class="code out pass">
+    <figcaption><span>Terminal, after python -m pytest -v (test lines only)</span></figcaption>
+<pre>tests/test_clean.py::test_rescale01_maps_smallest_to_0_and_largest_to_1 PASSED [ 33%]
+tests/test_clean.py::test_clean_names_returns_lower_case_snake_case PASSED [ 66%]
+tests/test_clean.py::test_parse_money_strips_dollar_signs_and_commas PASSED [100%]</pre>
+  </figure>
+
+  <h2>Reading a failure</h2>
+  <p>Suppose you had typed the expected name as <code>"zip-code"</code>. The report becomes:</p>
+
+  <figure class="code out fail">
+    <figcaption><span>Terminal</span></figcaption>
+<pre>tests\test_clean.py .F.                                                  [100%]
+
+================================== FAILURES ===================================
+_______________ test_clean_names_returns_lower_case_snake_case ________________
+
+    def test_clean_names_returns_lower_case_snake_case():
+        assert clean_names(["First Name"]) == ["first_name"]
+&gt;       assert clean_names(["Total ($)", " Zip-Code "]) == ["total", "zip-code"]
+E       AssertionError: assert ['total', 'zip_code'] == ['total', 'zip-code']
+E
+E         At index 1 diff: 'zip_code' != 'zip-code'
+E         Use -v to get more diff
+
+tests\test_clean.py:13: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_clean.py::test_clean_names_returns_lower_case_snake_case - ...
+========================= 1 failed, 2 passed in 2.63s =========================</pre>
+  </figure>
+
+  <p>Read it in three steps. <strong>What:</strong> the banner under <code>FAILURES</code> is the name you gave the test. <strong>Where:</strong> the <code>&gt;</code> marks the line that failed, and <code>tests\test_clean.py:13</code> gives the file and line number. <strong>Why:</strong> the lines that start with <code>E</code>. pytest has filled in both sides of the <code>==</code> for you, the actual value on the left and the expected value on the right, and it says where they first differ. Then decide which side is wrong. Here the function is fine and the test was mistyped, and that happens more often than you would think.</p>
+  <span class="cite">pytest's “assertion introspection will intelligently report intermediate values of the assert expression”. <a href="https://docs.pytest.org/en/stable/getting-started.html#create-your-first-test">pytest, “Get Started”</a>.</span>
+
+  <p>One more thing to know when reading a report: a test stops at its first failing assertion. Any assertions below it in the same function did not run, so they may be hiding more failures.</p>
+  <span class="cite">“a test stops at the first failing assertion, which gives you an incomplete picture if a later behavior is also broken.” <a href="https://learn.scientific-python.org/development/tutorials/test/">Scientific Python Development Guide, “Test” tutorial</a>.</span>
+
+  <div class="box trap">
+    <span class="label">Common trap</span>
+    <p>If the run stops with <code>ModuleNotFoundError: No module named 'clean'</code>, nothing is wrong with your tests. Python could not find <code>clean.py</code>: you typed <code>pytest</code> on its own, or you ran the command from a different folder. Go to the project folder and run <code>python -m pytest</code>.</p>
+  </div>
+
+  <h2>Try it</h2>
+  <ol class="steps">
+    <li>Download the <a href="https://github.com/acatlin/python-unit-testing/tree/main/examples/cleaning-project-starter">starter project</a> (or build the two files above by hand; typing them is good practice, and <code>clean.py</code> is in the starter folder). You need pandas and pytest installed.</li>
+    <li>Open a terminal in the project folder and run <code>python -m pytest</code>. You should see <code>3 passed</code>.</li>
+    <li>Add a third assertion to the <code>parse_money()</code> test, for the input <code>"$3,000"</code>, and run again. The count is still 3, because pytest counts tests. Now move that assertion into a new test of its own, with a name that says what it checks, and watch the count become 4.</li>
+    <li>Rename the test file to <code>clean_tests.py</code> and run again. You should see <code>collected 0 items</code> and <code>no tests ran</code>. Rename it back.</li>
+  </ol>
+
+  <h2>Check yourself</h2>
+  <section class="quiz" data-quiz="lesson-2" aria-label="Lesson 2 quiz">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">What makes a Python function a test that pytest will find and run?</p>
+        <ul class="opts">
+          <li data-correct>Its name starts with <code>test</code>.</li>
+          <li>Its body contains an <code>assert</code>.</li>
+          <li>Its first argument is <code>pytest</code>.</li>
+          <li>Its docstring mentions the test.</li>
+        </ul>
+        <p class="why">pytest goes by the name alone. A function full of assertions but named <code>check_rescale01()</code> is never run.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Which of these files in <code>tests/</code> will pytest collect tests from?</p>
+        <ul class="opts">
+          <li data-correct><code>test_clean.py</code></li>
+          <li><code>clean_tests.py</code></li>
+          <li><code>check_clean.py</code></li>
+          <li><code>clean.py</code></li>
+        </ul>
+        <p class="why">Test file names must match <code>test_*.py</code> (or <code>*_test.py</code>). <code>clean_tests.py</code>, with an s, matches neither and is silently skipped.</p>
+      </li>
+      <li class="q">
+        <p class="stem">A run stops with <code>ModuleNotFoundError: No module named 'clean'</code>. What is the likeliest cause?</p>
+        <ul class="opts">
+          <li data-correct>Python could not find the file <code>clean.py</code>.</li>
+          <li>The test file has the wrong name.</li>
+          <li>The pytest package is not installed yet.</li>
+          <li>The expected values were typed in wrong.</li>
+        </ul>
+        <p class="why">In a plain project, run <code>python -m pytest</code> from the project folder so that the folder is on Python's search path. A misnamed test file would not be collected at all, so it could not produce this error.</p>
+      </li>
+      <li class="q">
+        <p class="stem">A run ends with <code>1 failed, 2 passed</code>. What happened?</p>
+        <ul class="opts">
+          <li data-correct>Two tests passed and one failed.</li>
+          <li>Two files passed and one failed.</li>
+          <li>Two assertions passed and one failed.</li>
+          <li>Two tests passed and one skipped.</li>
+        </ul>
+        <p class="why">The summary counts tests. Those three tests might hold six assertions, and a test with one failing assertion counts as one failure.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Why run <code>python -m pytest</code> instead of plain <code>pytest</code> in a plain project?</p>
+        <ul class="opts">
+          <li data-correct>It puts the current folder on Python's path.</li>
+          <li>It runs every test file three times over.</li>
+          <li>It hides the report unless a test fails.</li>
+          <li>It installs pandas and pytest before each run.</li>
+        </ul>
+        <p class="why">That is what lets <code>from clean import …</code> find <code>clean.py</code>. Everything else about the two commands is the same.</p>
+      </li>
+    </ol>
+  </section>
+
+  <div class="box source">
+    <span class="label">Read next (primary source)</span>
+    <p><a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#conventions-for-python-test-discovery">pytest, “Good Integration Practices”</a>, the sections “Conventions for Python test discovery” and “Choosing a test layout”, for how the pytest team names and arranges test files.</p>
+  </div>
+
+  <div class="box ask">
+    <span class="label">Stuck or curious?</span>
+    <p>Ask. If a run does not look like the ones on this page, copy the whole report and take it to your instructor, a classmate, or an AI assistant. “Here is what I ran, here is what I got, here is what I expected” is the most useful question format there is.</p>
+  </div>
+
+  <nav class="pager" aria-label="Lesson">
+    <a href="0001-first-assertion.html">← Lesson 1: Your first assertion</a>
+    <a class="next" href="0003-choosing-assertions.html">Lesson 3: Choosing the right assertion →</a>
+  </nav>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.14.4 with pytest 9.2.0 on Windows; the folder after <code>rootdir:</code> is shortened. On macOS and Linux the command may be <code>python3</code>, paths use <code>/</code>, and the timings will differ.</p>
+</main>
+</body>
+</html>

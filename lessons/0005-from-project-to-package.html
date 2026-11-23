@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 5: From project to package · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="0001-first-assertion.html">1 Assertions</a>
+    <a href="0002-test-functions-and-test-files.html">2 Test files</a>
+    <a href="0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="0004-edge-cases-errors-and-bugs.html">4 Edge cases</a>
+    <a href="0005-from-project-to-package.html" aria-current="page">5 Packages</a>
+    <a href="../reference/cheat-sheet.html">Cheat sheet</a>
+    <a href="../reference/glossary.html">Glossary</a>
+    <a href="../reference/mastery-objectives.html">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Lesson 5 of 5 · about 30 minutes</p>
+  <h1>From project to package</h1>
+  <p class="lede">Your project already has a file of functions and a <code>tests/</code> folder. That is most of a Python package. Taking the last step means Python can import your code from anywhere, the packages it depends on are written down, and pytest's settings live in one file.</p>
+
+  <div class="win">
+    <span class="label">By the end you can</span>
+    <p>Move your functions and tests into an installable package and run all of them with <code>pytest</code>.</p>
+  </div>
+
+  <h2>From last time</h2>
+  <section class="quiz" aria-label="Warm-up">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">What does <code>pytest.raises(TypeError, match="must be numeric")</code> check about the error that is raised?</p>
+        <ul class="opts">
+          <li data-correct>The error's type and its message.</li>
+          <li>The error's type and its traceback.</li>
+          <li>The function's result and its type.</li>
+          <li>The warning's type and its message.</li>
+        </ul>
+        <p class="why">The first argument names the type of exception; <code>match</code> is a regular expression searched for in the error message.</p>
+      </li>
+      <li class="q">
+        <p class="stem">After finding a bug, why write the failing test before the fix?</p>
+        <ul class="opts">
+          <li data-correct>It proves the test detects the bug.</li>
+          <li>It makes the fix run more quickly.</li>
+          <li>It hides the bug from other users.</li>
+          <li>It removes the need for a fix.</li>
+        </ul>
+        <p class="why">A test you have seen fail is one you know is able to fail.</p>
+      </li>
+    </ol>
+  </section>
+
+  <h2>What changes, and what does not</h2>
+  <p>Everything you learned about assertions and test functions carries over unchanged. Three chores go away.</p>
+
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Chore</th><th>Plain project</th><th>Package</th></tr></thead>
+    <tbody>
+      <tr><td>Making your functions importable</td><td>Start every run with <code>python -m pytest</code>, from the right folder</td><td>Install the package once; after that <code>pytest</code> on its own works</td></tr>
+      <tr><td>Recording what your code needs</td><td>You remember to install pandas and pytest</td><td>Two lists in the <code>pyproject.toml</code> file</td></tr>
+      <tr><td>Choosing pytest's settings</td><td>Typed on the command line each time</td><td>A table in the <code>pyproject.toml</code> file</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <span class="cite">The layout and the install step follow <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html">pytest, “Good Integration Practices”</a>.</span>
+
+  <h2>Build it</h2>
+  <p>There are tools that generate a package for you, but a package is only three folders and a settings file, and building one by hand shows you what each part is for. Follow the steps.</p>
+
+  <ol class="steps">
+    <li>
+      <strong>Make the folders.</strong> Create a new folder called <code>cleaner</code> that is <em>not</em> inside another project. Inside it, make <code>src/cleaner/</code> and <code>tests/</code>. Copy your <code>clean.py</code> into <code>src/cleaner/</code> and your <code>test_clean.py</code> into <code>tests/</code>. Then create an empty file called <code>__init__.py</code> next to <code>clean.py</code>; it marks the folder as a package that can be imported.
+<pre class="tree">cleaner/
+├── src/
+│   └── cleaner/
+│       ├── __init__.py
+│       └── clean.py
+└── tests/
+    └── test_clean.py</pre>
+    </li>
+    <li>
+      <strong>Write the settings file.</strong> Save this as <code>pyproject.toml</code> in the top <code>cleaner</code> folder.
+      <figure class="code toml">
+        <figcaption><span>pyproject.toml</span></figcaption>
+<pre><code>[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cleaner"
+version = "0.1.0"
+description = "Small data-cleaning helpers"
+requires-python = "&gt;=3.11"
+dependencies = ["pandas"]
+
+[dependency-groups]
+dev = ["pytest&gt;=9"]
+
+[tool.pytest]
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]</code></pre>
+      </figure>
+    </li>
+    <li>
+      <strong>Make a virtual environment</strong> for the package and switch it on. Open a terminal in the top <code>cleaner</code> folder. Use the first <code>activate</code> line on Windows and the second on macOS or Linux.
+      <figure class="code sh">
+        <figcaption><span>Terminal, in cleaner/</span></figcaption>
+<pre><code>python -m venv .venv
+.venv\Scripts\activate          # Windows
+source .venv/bin/activate       # macOS and Linux</code></pre>
+      </figure>
+    </li>
+    <li>
+      <strong>Install your package</strong> into that environment, in editable mode (<code>-e</code>), together with the <code>dev</code> group. The dot means “the project in this folder”.
+      <figure class="code sh">
+        <figcaption><span>Terminal</span></figcaption>
+<pre><code>python -m pip install -e . --group dev</code></pre>
+      </figure>
+      <figure class="code out pass">
+        <figcaption><span>Terminal (last line)</span></figcaption>
+<pre>Successfully installed cleaner-0.1.0 colorama-0.4.6 iniconfig-2.3.1 numpy-2.5.5 packaging-26.3 pandas-3.1.1 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 python-dateutil-4.0.0 tzdata-2026.6</pre>
+      </figure>
+    </li>
+    <li>
+      <strong>Change one line in the test file.</strong> Your functions now live in the module <code>clean</code> inside the package <code>cleaner</code>, so the import says so.
+      <figure class="code py">
+        <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>from cleaner.clean import clean_names, parse_money, rescale01, summarise_by</code></pre>
+      </figure>
+    </li>
+    <li>
+      <strong>Run the tests.</strong> Plain <code>pytest</code> is enough now.
+      <figure class="code sh">
+        <figcaption><span>Terminal, in cleaner/</span></figcaption>
+<pre><code>pytest</code></pre>
+      </figure>
+      <figure class="code out pass">
+        <figcaption><span>Terminal</span></figcaption>
+<pre>============================= test session starts =============================
+platform win32 -- Python 3.14.4, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\you\cleaner
+configfile: pyproject.toml
+testpaths: tests
+collected 12 items
+
+tests\test_clean.py ............                                         [100%]
+
+============================= 12 passed in 5.60s ==============================</pre>
+      </figure>
+    </li>
+  </ol>
+  <span class="cite">“You can then create a virtual environment and install your package in ‘editable’ mode, together with the <code>dev</code> group”; “<code>pip install --group</code> needs pip 25.1 or newer”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#install-package-in-a-virtual-environment">pytest, “Install package in a virtual environment”</a>. If pip rejects <code>--group</code>, run <code>python -m pip install --upgrade pip</code> first.</span>
+
+  <h2>What you now have</h2>
+
+<pre class="tree">cleaner/
+├── pyproject.toml           settings: name, dependencies, pytest options
+├── .venv/                   the virtual environment (never edit, never commit)
+├── src/
+│   └── cleaner/
+│       ├── __init__.py      marks the folder as a package
+│       └── clean.py         your functions
+└── tests/
+    └── test_clean.py        your tests</pre>
+
+  <p>Compare this with the tree in <a href="0002-test-functions-and-test-files.html">Lesson 2</a>. <code>tests/</code> is exactly where it was. <code>clean.py</code> has moved down into <code>src/cleaner/</code>, and one file does the work that used to be yours.</p>
+
+  <p><strong><code>pyproject.toml</code></strong> holds the package's settings in four tables.</p>
+
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th>Table</th><th>What it says</th></tr></thead>
+    <tbody>
+      <tr><td><code>[build-system]</code></td><td>Which tool turns the folder into an installable package. You will not touch it again.</td></tr>
+      <tr><td><code>[project]</code></td><td>The package's name and version, and <code>dependencies</code>: the packages your <em>functions</em> need. <code>summarise_by()</code> and its neighbours use pandas.</td></tr>
+      <tr><td><code>[dependency-groups]</code></td><td>Packages that only the people working on the code need. pytest is used by your <em>tests</em>, not by your functions, so it goes in the <code>dev</code> group.</td></tr>
+      <tr><td><code>[tool.pytest]</code></td><td>pytest's settings: look for tests in <code>tests/</code>, and import test files in the way pytest recommends for new projects.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <span class="cite">“The <code>[dependency-groups]</code> table specifies dependencies for development tasks such as testing and linting.” <a href="https://packaging.python.org/en/latest/guides/writing-pyproject-toml/">Python Packaging User Guide, “Writing your pyproject.toml”</a>. “For new projects, we recommend to use <code>importlib</code> import mode”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#choosing-a-test-layout">pytest, “Choosing a test layout”</a>. The <code>[tool.pytest]</code> table needs pytest 9.</span>
+
+  <p><strong>The editable install</strong> is what replaces <code>python -m pytest</code>. It tells the environment where your package's files are instead of copying them, so <code>from cleaner.clean import …</code> works from any folder, and every edit you make to <code>clean.py</code> takes effect the next time you run the tests. You install once, not after every change.</p>
+  <span class="cite">“Editable installs allow you to install your project without copying any files. Instead, the files in the development directory are added to Python's import path.” <a href="https://pip.pypa.io/en/stable/topics/local-project-installs/#editable-installs">pip documentation, “Local project installs”</a>.</span>
+
+  <p><strong>The <code>src/</code> folder</strong> looks like an extra layer, and it earns its place. With your code one level down, the tests can only reach it through the installed package, which is the way anyone else would use it.</p>
+  <span class="cite">“The src layout helps prevent accidental usage of the in-development copy of the code.” <a href="https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/">Python Packaging User Guide, “src layout vs flat layout”</a>.</span>
+
+  <div class="box trap">
+    <span class="label">Common trap</span>
+    <p>If the run stops with <code>ModuleNotFoundError: No module named 'cleaner'</code>, the package is not installed in the environment you are using. Either you skipped the install step, or you opened a new terminal: a virtual environment has to be activated again in every new terminal before <code>pytest</code> can see your package.</p>
+  </div>
+  <span class="cite">“If you open a new shell window and want to use the virtual environment, reactivate it.” <a href="https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/">Python Packaging User Guide, “Install packages in a virtual environment using pip and venv”</a>.</span>
+
+  <h2>The working loop</h2>
+  <p>With a package, day-to-day work becomes a short cycle. You will repeat it many times an hour.</p>
+
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Step</th><th>Command</th></tr></thead>
+    <tbody>
+      <tr><td>Edit a function or a test</td><td>Nothing to reload: the install is editable</td></tr>
+      <tr><td>Run every test</td><td><code>pytest</code></td></tr>
+      <tr><td>Run only the tests whose names contain a word</td><td><code>pytest -k rescale01</code></td></tr>
+      <tr><td>Rerun only the tests that failed last time</td><td><code>pytest --lf</code></td></tr>
+      <tr><td>Stop at the first failure</td><td><code>pytest -x</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <span class="cite"><code>-k</code>: <a href="https://docs.pytest.org/en/stable/how-to/usage.html#specifying-which-tests-to-run">“Specifying which tests to run”</a>. <code>--lf</code>: <a href="https://docs.pytest.org/en/stable/how-to/cache.html#rerunning-only-failures-or-failures-first">“Rerunning only failures or failures first”</a>. <code>-x</code>: <a href="https://docs.pytest.org/en/stable/how-to/failures.html#stopping-after-the-first-or-n-failures">“Stopping after the first (or N) failures”</a>.</span>
+
+  <p>Because running the tests is now one short word, you will run them far more often, and tests that are run often are the ones that catch things.</p>
+
+  <h2>Try it</h2>
+  <ol class="steps">
+    <li>Follow the six steps under “Build it” with your own project from Lesson 4. Finish with <code>12 passed</code> or more. A finished copy is in <a href="https://github.com/acatlin/python-unit-testing/tree/main/examples/cleaner"><code>examples/cleaner</code></a>.</li>
+    <li>Break <code>clean_names()</code> on purpose (delete <code>.lower()</code>), run <code>pytest</code>, and read the report. Run <code>pytest --lf</code> and notice how many tests it collects. Undo the change and run everything again.</li>
+    <li>Add a new function to the package test-first: write a failing test, then make it pass. An idea: <code>squish()</code>, which trims a string and collapses runs of spaces into one. Put it in a new file, <code>src/cleaner/text.py</code>, with its tests in <code>tests/test_text.py</code>.</li>
+  </ol>
+
+  <h2>Check yourself</h2>
+  <section class="quiz" data-quiz="lesson-5" aria-label="Lesson 5 quiz">
+    <ol class="questions">
+      <li class="q">
+        <p class="stem">In a package, what does the job that <code>python -m pytest</code> did in a plain project: letting the tests import your code?</p>
+        <ul class="opts">
+          <li data-correct>An editable install of the package.</li>
+          <li>A second copy placed inside <code>tests/</code>.</li>
+          <li>A longer import line in <code>__init__.py</code>.</li>
+          <li>An extra option for <code>python -m</code>.</li>
+        </ul>
+        <p class="why"><code>python -m pip install -e .</code> makes the package importable from any folder, so plain <code>pytest</code> can find it.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Which command installs your package so that later edits to its code take effect without reinstalling?</p>
+        <ul class="opts">
+          <li data-correct><code>pip install -e .</code></li>
+          <li><code>pip install --upgrade pip</code></li>
+          <li><code>pip install pandas pytest</code></li>
+          <li><code>pip install --group dev</code></li>
+        </ul>
+        <p class="why"><code>-e</code> is short for editable, and the dot is the project in the current folder. Run it once per environment. Adding <code>--group dev</code> to that command installs pytest as well; on its own, <code>--group dev</code> installs pytest and not your package.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Why can package tests say <code>from cleaner.clean import …</code> whichever folder you run them from?</p>
+        <ul class="opts">
+          <li data-correct>The installed package is importable from anywhere.</li>
+          <li>Package tests never call your own functions.</li>
+          <li>Pytest copies your code into <code>tests/</code> first.</li>
+          <li>Python searches every folder on the disk.</li>
+        </ul>
+        <p class="why">Installing the package puts it on the import path of that environment, so the folder you happen to be in no longer matters.</p>
+      </li>
+      <li class="q">
+        <p class="stem">In <code>pyproject.toml</code>, where does pytest belong when only your tests need it?</p>
+        <ul class="opts">
+          <li data-correct>Under <code>[dependency-groups]</code>, in the <code>dev</code> group.</li>
+          <li>Under <code>[project]</code>, in the <code>dependencies</code> list.</li>
+          <li>Under <code>[build-system]</code>, in the <code>requires</code> list.</li>
+          <li>Under <code>[tool.pytest]</code>, in the <code>addopts</code> list.</li>
+        </ul>
+        <p class="why"><code>dependencies</code> is for what your functions need (pandas). Tools that only developers need, such as pytest, go in a dependency group.</p>
+      </li>
+      <li class="q">
+        <p class="stem">Which command reruns only the tests that failed on the previous run?</p>
+        <ul class="opts">
+          <li data-correct><code>pytest --lf</code></li>
+          <li><code>pytest -x</code></li>
+          <li><code>pytest -k</code></li>
+          <li><code>pytest -v</code></li>
+        </ul>
+        <p class="why"><code>--lf</code> stands for last failed. <code>-x</code> stops at the first failure, <code>-k</code> selects tests by name, and <code>-v</code> lists every test.</p>
+      </li>
+    </ol>
+  </section>
+
+  <h2>Where to go from here</h2>
+  <p>You can now write, organise and run tests by hand, in a project or a package. There is more to learn, and later lessons in this course will take it up: parametrised tests that run one test over many inputs, fixtures and <code>conftest.py</code> for shared set-up, skipping tests, and measuring how much of your code the tests reach.</p>
+  <p>Testing is also a craft that people argue about. When you have a question with no clear answer in the documentation, such as how much testing is enough for an analysis project, ask people who do this for a living. The pytest project points to <a href="https://github.com/pytest-dev/pytest/discussions">pytest discussions on GitHub</a> “for general questions”.</p>
+
+  <div class="box source">
+    <span class="label">Read next (primary source)</span>
+    <p><a href="https://packaging.python.org/en/latest/tutorials/packaging-projects/">Python Packaging User Guide, “Packaging Python Projects”</a>, as far as “Configuring metadata”. It builds a small package from nothing with the same <code>src/</code> layout. Then read <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html">pytest's “Good Integration Practices”</a> from the top.</p>
+  </div>
+
+  <div class="box ask">
+    <span class="label">Stuck or curious?</span>
+    <p>Ask. Package setup produces unfamiliar messages the first time. Copy the message and take it to your instructor, a classmate, or an AI assistant before you spend half an hour guessing.</p>
+  </div>
+
+  <nav class="pager" aria-label="Lesson">
+    <a href="0004-edge-cases-errors-and-bugs.html">← Lesson 4: Edge cases, errors and bugs</a>
+    <a class="next" href="../index.html">Course home →</a>
+  </nav>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.14.4 with pytest 9.2.0, pandas 3.1.1 and pip 26.0.1 on Windows; the folder after <code>rootdir:</code> is shortened, and the versions in the install line will be newer when you run it.</p>
+</main>
+</body>
+</html>

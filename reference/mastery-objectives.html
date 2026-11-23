@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mastery objectives · Unit Testing in Python</title>
+<link rel="stylesheet" href="../assets/course.css">
+<script src="../assets/course.js" defer></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner">
+  <a class="brand" href="../index.html">Unit Testing in Python</a>
+  <nav aria-label="Course">
+    <a href="../lessons/0001-first-assertion.html">1 Assertions</a>
+    <a href="../lessons/0002-test-functions-and-test-files.html">2 Test files</a>
+    <a href="../lessons/0003-choosing-assertions.html">3 Toolkit</a>
+    <a href="../lessons/0004-edge-cases-errors-and-bugs.html">4 Edge cases</a>
+    <a href="../lessons/0005-from-project-to-package.html">5 Packages</a>
+    <a href="cheat-sheet.html">Cheat sheet</a>
+    <a href="glossary.html">Glossary</a>
+    <a href="mastery-objectives.html" aria-current="page">Objectives</a>
+  </nav>
+</div></header>
+
+<main class="page">
+  <p class="eyebrow">Reference · what you can do after each lesson</p>
+  <h1>Mastery objectives</h1>
+  <p class="lede">Each line below is something you can do once you have mastered a lesson. If you can do it without looking at the lesson page, tick it off. If you cannot, the table says where to practise.</p>
+
+  <h2>How to read the tables</h2>
+  <p>Every objective has two kinds of evidence. <strong>Doing</strong> is a “Try it” step, where you write or run code yourself. <strong>Recognition</strong> is a multiple-choice question, where you pick the right answer from four. Doing is the stronger evidence: an objective is mastered when you can do it, not when you can spot it.</p>
+  <ul>
+    <li><code>L4-T2</code> is Lesson 4, “Try it” step 2.</li>
+    <li><code>L3-Q2</code> is Lesson 3, “Check yourself” question 2.</li>
+    <li><code>L2-W1</code> is Lesson 2, warm-up question 1 (the “From last time” quiz).</li>
+  </ul>
+  <p>Words such as <a href="glossary.html#assertion">assertion</a>, <a href="glossary.html#test">test</a> and <a href="glossary.html#edge-case">edge case</a> are defined in the <a href="glossary.html">glossary</a>.</p>
+
+  <h2>Lesson 1: Your first assertion</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Doing</th><th>Recognition</th></tr></thead>
+    <tbody>
+      <tr><td>1.1</td><td>Write an <code>assert</code> statement that passes, with the function call on the left of <code>==</code> and an expected value you worked out yourself on the right.</td><td>L1-T2, L1-T3</td><td>L1-Q2</td></tr>
+      <tr><td>1.2</td><td>Tell a pass from a failure at the console and, after a failure, find the element that disagrees by running the left side on its own, and say whether the function or the expected value is wrong.</td><td>L1-T3, L1-T4</td><td>L1-Q1, L2-W1</td></tr>
+      <tr><td>1.3</td><td>Choose between a bare <code>==</code> and <code>== pytest.approx()</code> and predict which one passes, for floating-point noise and for a whole number against its decimal (<code>1</code> and <code>1.0</code>).</td><td>L1-T5</td><td>L1-Q3, L2-W2</td></tr>
+      <tr><td>1.4</td><td>Explain what a written test gives you that a look at console output does not, and what it does not guarantee.</td><td></td><td>L1-Q4</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Taught in <a href="../lessons/0001-first-assertion.html">Lesson 1</a>.</p>
+
+  <h2>Lesson 2: Test functions and test files</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Doing</th><th>Recognition</th></tr></thead>
+    <tbody>
+      <tr><td>2.1</td><td>Write a test function about one behaviour, with a name that says what the function should do.</td><td>L2-T3, L3-T3, L4-T2, L4-T3</td><td>L2-Q1</td></tr>
+      <tr><td>2.2</td><td>Lay out a plain project with <code>clean.py</code> and <code>tests/</code>, and create a test file that pytest will find and that imports the functions it tests.</td><td>L2-T1, L2-T4</td><td>L2-Q2, L3-W1, L3-W2</td></tr>
+      <tr><td>2.3</td><td>Run every test in a plain project with one command, and fix a run that stops with <code>ModuleNotFoundError: No module named 'clean'</code>.</td><td>L2-T2</td><td>L2-Q3, L2-Q5, L4-W2</td></tr>
+      <tr><td>2.4</td><td>Read a pytest report: say what the last line counts and, for a failure, which test it is, where it is, why it failed, and whether the code or the test is wrong.</td><td>L2-T3, L4-T1, L5-T2</td><td>L2-Q4</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Taught in <a href="../lessons/0002-test-functions-and-test-files.html">Lesson 2</a>; “one behaviour per test” in objective 2.1 is from <a href="../lessons/0004-edge-cases-errors-and-bugs.html">Lesson 4</a>.</p>
+
+  <h2>Lesson 3: Choosing the right assertion</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Doing</th><th>Recognition</th></tr></thead>
+    <tbody>
+      <tr><td>3.1</td><td>Pick the check that fits what is being compared (<code>==</code>, <code>pytest.approx()</code>, <code>assert_series_equal()</code>, <code>assert_frame_equal()</code>, or a plain <code>assert</code> on a length, dtype, type or bound), and say what its failure message gains over <code>.equals()</code>.</td><td>L3-T3</td><td>L3-Q1, L3-Q3, L3-Q4, L4-W1</td></tr>
+      <tr><td>3.2</td><td>Test the values of a function that returns a data frame: build a tiny input by hand, call the function, and compare the result with an expected data frame you typed by hand, with dtypes that match.</td><td>L3-T1, L3-T2</td><td>L3-Q2, L3-Q5</td></tr>
+      <tr><td>3.3</td><td>Test the structure of a result (its type and its column names) in a separate test that builds everything it needs.</td><td>L3-T1</td><td>L3-Q3</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Taught in <a href="../lessons/0003-choosing-assertions.html">Lesson 3</a>.</p>
+
+  <h2>Lesson 4: Edge cases, errors and bugs</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Doing</th><th>Recognition</th></tr></thead>
+    <tbody>
+      <tr><td>4.1</td><td>For a function that takes a column, list the edge cases (missing values, all values the same, a single value, empty input, the wrong type), decide what should happen for each, and record each decision as a test.</td><td>L4-T1, L4-T2, L4-T3</td><td>L4-Q4</td></tr>
+      <tr><td>4.2</td><td>On finding a bug, write a test that fails, fix the function, and run every test again.</td><td>L4-T1, L5-T3</td><td>L4-Q3, L5-W2</td></tr>
+      <tr><td>4.3</td><td>Test that a function stops with a specific error by giving <code>pytest.raises()</code> an exception type and a <code>match</code> pattern, and explain why <code>pytest.raises(Exception)</code> can pass while testing nothing.</td><td>L4-T1</td><td>L4-Q1, L4-Q2, L5-W1</td></tr>
+      <tr><td>4.4</td><td>State with <code>pytest.warns()</code> when a function should warn and with <code>warnings.simplefilter("error")</code> when it should not, and treat a warning count on the last line of a report as something to investigate.</td><td>L4-T1</td><td>L4-Q5</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Taught in <a href="../lessons/0004-edge-cases-errors-and-bugs.html">Lesson 4</a>.</p>
+
+  <h2>Lesson 5: From project to package</h2>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Doing</th><th>Recognition</th></tr></thead>
+    <tbody>
+      <tr><td>5.1</td><td>Turn a plain project into a package with a <code>src/</code> layout, an <code>__init__.py</code> and a <code>pyproject.toml</code>, install it in editable mode in a virtual environment, and run every test with <code>pytest</code>.</td><td>L5-T1</td><td>L5-Q2</td></tr>
+      <tr><td>5.2</td><td>Say what the editable install does in place of <code>python -m pytest</code>, and what changes in the test file's import line.</td><td>L5-T1</td><td>L5-Q1, L5-Q3</td></tr>
+      <tr><td>5.3</td><td>Declare dependencies in <code>pyproject.toml</code>: put a package under <code>dependencies</code> or in a dependency group according to whether your functions need it or only your tests do.</td><td>L5-T1</td><td>L5-Q4</td></tr>
+      <tr><td>5.4</td><td>Work in the package loop (edit, <code>pytest</code>, and <code>-k</code>, <code>--lf</code> or <code>-x</code> to narrow a run) and add a new function test-first in a new module with its own test file.</td><td>L5-T2, L5-T3</td><td>L5-Q5</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Taught in <a href="../lessons/0005-from-project-to-package.html">Lesson 5</a>.</p>
+
+  <h2>Coming next: not yet taught</h2>
+  <p>Lesson 5 ends by naming what the course takes up next. These objectives have no lesson yet. If you want to get ahead, each one points at the section of the official documentation that teaches it. All of them assume the package from Lesson 5.</p>
+
+  <h3>Parametrised tests</h3>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Recommended reading</th></tr></thead>
+    <tbody>
+      <tr><td>P1</td><td>Turn several tests that differ only in their input and expected value into one test with <code>@pytest.mark.parametrize</code>, and say how many tests pytest then reports.</td><td><a href="https://docs.pytest.org/en/stable/how-to/parametrize.html#pytest-mark-parametrize-parametrizing-test-functions">pytest, “<code>@pytest.mark.parametrize</code>: parametrizing test functions”</a></td></tr>
+      <tr><td>P2</td><td>When a parametrised test fails, read the values in square brackets after its name to tell which case failed.</td><td><a href="https://docs.pytest.org/en/stable/how-to/parametrize.html#pytest-mark-parametrize-parametrizing-test-functions">The same section</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Fixtures and shared set-up</h3>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Recommended reading</th></tr></thead>
+    <tbody>
+      <tr><td>F1</td><td>Move set-up that several tests repeat into a function marked <code>@pytest.fixture</code>, and have a test request it by naming it as an argument.</td><td><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html#requesting-fixtures">pytest, “How to use fixtures”, “Requesting fixtures”</a></td></tr>
+      <tr><td>F2</td><td>Share a fixture between test files by putting it in <code>conftest.py</code>.</td><td><a href="https://docs.pytest.org/en/stable/how-to/fixtures.html#scope-sharing-fixtures-across-classes-modules-packages-or-session">pytest, “How to use fixtures”, “Scope: sharing fixtures…”</a></td></tr>
+      <tr><td>F3</td><td>Write files in a test only inside the temporary folder that the built-in <code>tmp_path</code> fixture provides.</td><td><a href="https://docs.pytest.org/en/stable/how-to/tmp_path.html#the-tmp-path-fixture">pytest, “The <code>tmp_path</code> fixture”</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Skipping tests</h3>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Recommended reading</th></tr></thead>
+    <tbody>
+      <tr><td>K1</td><td>Skip a test under a stated condition with <code>@pytest.mark.skip</code>, <code>@pytest.mark.skipif</code> or <code>pytest.importorskip()</code>, and list the skips and their reasons with <code>pytest -rs</code>.</td><td><a href="https://docs.pytest.org/en/stable/how-to/skipping.html#skipping-test-functions">pytest, “Skipping test functions”</a></td></tr>
+      <tr><td>K2</td><td>Say how a skip differs from an expected failure (<code>xfail</code>), and find the count of each on the last line of the report.</td><td><a href="https://docs.pytest.org/en/stable/how-to/skipping.html">pytest, “How to use skip and xfail to deal with tests that cannot succeed”</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Test coverage</h3>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Recommended reading</th></tr></thead>
+    <tbody>
+      <tr><td>C1</td><td>Measure which lines your tests run with <code>coverage run -m pytest</code> and <code>coverage report -m</code>, and use the <code>Missing</code> column to find lines that no test runs.</td><td><a href="https://coverage.readthedocs.io/en/latest/">Coverage.py, “Quick start”</a></td></tr>
+      <tr><td>C2</td><td>Open the report made by <code>coverage html</code> and use the lines it marks as missed to choose the next test to write.</td><td><a href="https://coverage.readthedocs.io/en/latest/">Coverage.py, “Quick start”</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Tests on GitHub Actions</h3>
+  <div class="table-wrap wide">
+  <table>
+    <thead><tr><th></th><th>You can…</th><th>Recommended reading</th></tr></thead>
+    <tbody>
+      <tr><td>G1</td><td>Add a workflow that installs your package and runs <code>pytest</code> on every push, using the <code>checkout</code> and <code>setup-python</code> actions, and say which Python versions it runs on.</td><td><a href="https://docs.github.com/en/actions/tutorials/build-and-test-code/python">GitHub Docs, “Building and testing Python”</a></td></tr>
+      <tr><td>G2</td><td>When a GitHub Actions run fails, find the failing test in the log, reproduce it on your own computer, fix it, and push until the run passes.</td><td><a href="https://docs.github.com/en/actions/tutorials/build-and-test-code/python#testing-with-pytest-and-pytest-cov">GitHub Docs, “Testing with pytest and pytest-cov”</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Later</h2>
+  <p>Four more topics may follow and have no objectives yet: replacing slow or unreliable parts of a program during a test (pytest's <code>monkeypatch</code>), test-first development as a full method, snapshot tests for output that is awkward to type out, and validating data (as opposed to functions).</p>
+
+  <p class="colophon">Reading pointers are to the <a href="https://docs.pytest.org/en/stable/">pytest 9.2 documentation</a>, <a href="https://coverage.readthedocs.io/en/latest/">Coverage.py 7.17</a> and <a href="https://docs.github.com/en/actions/tutorials/build-and-test-code/python">GitHub Docs</a>, read on 2026-11-23. See also the <a href="cheat-sheet.html">cheat sheet</a> and the <a href="glossary.html">glossary</a>.</p>
+</main>
+</body>
+</html>
