@@ -115,6 +115,25 @@ def test_rescale01_returns_one_float_per_input_value():
     assert x.max() <= 1
 '''
 
+THOUSANDS_TEST = '''
+
+def test_parse_money_reads_thousands_without_cents():
+    assert parse_money(pd.Series(["$3,000"])).tolist() == [3000]
+'''
+
+WARNING_TESTS = '''
+
+def test_parse_money_warns_when_a_value_cannot_be_parsed():
+    with pytest.warns(UserWarning, match="could not be parsed"):
+        parse_money(pd.Series(["n/a"]))
+
+
+def test_parse_money_is_quiet_when_every_value_parses():
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        parse_money(pd.Series(["$5"]))
+'''
+
 MISSING_TEST = '''
 
 def test_rescale01_keeps_missing_values_missing():
@@ -215,6 +234,7 @@ def collect_real_output(tmp: Path) -> str:
     code = project / "clean.py"
     replace_in(tests, "from clean import clean_names, parse_money, rescale01\n",
                "from clean import clean_names, parse_money, rescale01, summarise_by\n")
+    append(tests, THOUSANDS_TEST)                    # Lesson 2, step 3
     append(tests, LESSON_3_TESTS)
     append(tests, MISSING_TEST)
     out.append(console(project, "import pandas as pd\nfrom clean import rescale01\n"
@@ -222,13 +242,14 @@ def collect_real_output(tmp: Path) -> str:
     append(tests, CONSTANT_TEST)
     out.append(pytest(project))                      # the bug, caught
     replace_in(code, *CONSTANT_FIX)
-    replace_in(tests, "import pandas as pd\n", "import pandas as pd\nimport pytest\n")
+    replace_in(tests, "import pandas as pd\n", "import warnings\n\nimport pandas as pd\nimport pytest\n")
     append(tests, ERROR_TEST)
     out.append(pytest(project))                      # the cryptic error
     replace_in(code, "    lo, hi = x.min(), x.max()\n    if lo == hi:",
                "    if not pd.api.types.is_numeric_dtype(x):\n"
                '        raise TypeError("x must be a numeric column")\n'
                "    lo, hi = x.min(), x.max()\n    if lo == hi:")
+    append(tests, WARNING_TESTS)
     (project / "tests" / "test_demo.py").write_text(WARNING_DEMO, encoding="utf-8", newline="\n")
     out.append(pytest(project))                      # a warning nobody asked for
 

@@ -1,4 +1,3 @@
-import re
 import warnings
 
 import pandas as pd
@@ -18,6 +17,7 @@ def test_rescale01_returns_one_float_per_input_value():
     x = rescale01(pd.Series([1, 2, 3]))
     assert x.dtype == "float64"
     assert len(x) == 3
+    assert x.max() <= 1
 
 
 def test_rescale01_keeps_missing_values_missing():
@@ -43,17 +43,16 @@ def test_clean_names_returns_lower_case_snake_case():
     assert clean_names(["Total ($)", " Zip-Code "]) == ["total", "zip_code"]
 
 
-def test_clean_names_output_has_only_letters_digits_and_underscores():
-    for name in clean_names(["First Name", "Total ($)"]):
-        assert re.fullmatch(r"[a-z0-9_]+", name)
-
-
 # parse_money() -------------------------------------------------------------
 
 
 def test_parse_money_strips_dollar_signs_and_commas():
     assert parse_money(pd.Series(["$1,200.50"])).tolist() == [1200.5]
     assert parse_money(pd.Series(["75"])).tolist() == [75]
+
+
+def test_parse_money_reads_thousands_without_cents():
+    assert parse_money(pd.Series(["$3,000"])).tolist() == [3000]
 
 
 def test_parse_money_warns_when_a_value_cannot_be_parsed():

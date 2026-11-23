@@ -107,7 +107,7 @@ AssertionError</pre>
   </figure>
 
   <p>The third element was 1.0 and you said 2. Put the 1 back and the assertion is silent again. Having to dig for the values is a nuisance, and <a href="0002-test-functions-and-test-files.html">Lesson 2</a> removes it: the test runner pytest prints both sides for you.</p>
-  <span class="cite">Output shown is from the Python 3.14.4 console. A notebook lays the same error out differently; the last line is the same.</span>
+  <span class="cite">Output shown is from the Python 3.14.4 console. The <code>File</code> line says where the code was typed and will differ on your screen, and a notebook lays the whole error out differently; the last line is the same.</span>
 
   <h2>Equal, or close enough?</h2>
   <p>Computers store most decimal numbers approximately, which leads to a famous surprise.</p>
@@ -132,11 +132,11 @@ AssertionError</pre>
 <pre>[0.0, 0.5000000000000001, 1.0]</pre>
   </figure>
 
-  <p>An assertion that compared this with <code>[0, 0.5, 1]</code> using a bare <code>==</code> would fail for a reason that has nothing to do with a bug. The testing package <a href="https://docs.pytest.org/">pytest</a>, which nearly everyone uses in Python, has the remedy. Install it once from a terminal, then import it.</p>
+  <p>An assertion that compared this with <code>[0, 0.5, 1]</code> using a bare <code>==</code> would fail for a reason that has nothing to do with a bug. The testing package <a href="https://docs.pytest.org/">pytest</a>, which nearly everyone uses in Python, has the remedy. Install it once per environment. Type this in a terminal, which is your computer's command line and not the Python console with its <code>&gt;&gt;&gt;</code> prompt; then go back to Python and import it.</p>
 
   <figure class="code sh">
     <figcaption><span>Terminal</span></figcaption>
-<pre><code>python -m pip install pytest pandas    # once per environment</code></pre>
+<pre><code>python -m pip install pytest pandas</code></pre>
   </figure>
 
   <p>Wrap the expected value in <code>pytest.approx()</code> and <code>==</code> ignores tiny floating-point differences (by default, anything smaller than one part in a million of the expected value).</p>

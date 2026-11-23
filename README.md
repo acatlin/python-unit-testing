@@ -38,15 +38,16 @@ The site is plain static HTML served by GitHub Pages from the root of `main`. Th
 ```sh
 python tools/check_site.py      # quiz rules and internal links
 python tools/run_examples.py    # runs every example's tests
+python tools/check_outputs.py   # re-runs each lesson's scenario and compares it with the output shown
 ```
 
-The second command needs pandas and pytest, and the Lesson 5 package installed in editable mode. In a virtual environment:
+The second and third commands need pandas and pytest, and the Lesson 5 package installed in editable mode. In a virtual environment:
 
 ```sh
 python -m pip install -e examples/cleaner --group examples/cleaner/pyproject.toml:dev
 ```
 
-Both checks run on every push in GitHub Actions (`.github/workflows/check.yml`), on Python 3.11 and 3.14.
+The first two run on every push in GitHub Actions (`.github/workflows/check.yml`), on Python 3.11 and 3.14. The third is run by hand before changing a lesson's output: the pages quote one set of versions, so it is expected to need attention when pytest or pandas changes its wording.
 
 Quiz rules enforced by the checker: four options per question, exactly one correct, and all options the same number of words and of similar length, so the answer cannot be guessed from its shape.
 

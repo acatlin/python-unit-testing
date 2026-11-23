@@ -129,7 +129,7 @@ E
 E         At index 0 diff: nan != 0
 E         Use -v to get more diff
 
-tests\test_clean.py:55: AssertionError</pre>
+tests\test_clean.py:59: AssertionError</pre>
   </figure>
 
   <p>The failure matters. It proves that the test can see this bug. A test written after the fix passes the first time you run it, and you never find out whether it would have caught anything.</p>
@@ -173,7 +173,7 @@ tests\test_clean.py:55: AssertionError</pre>
   </div>
   <span class="cite">“Because <code>Exception</code> is the base class of almost all exceptions, it is easy for this to hide real bugs”. <a href="https://docs.pytest.org/en/stable/reference/reference.html#pytest.raises"><code>pytest.raises()</code> reference</a>.</span>
 
-  <p>Say which error you mean, in two ways. Name the specific type of exception, and give <code>match</code> a piece of text (a <a href="../reference/glossary.html#regular-expression">regular expression</a>) that the error message must contain.</p>
+  <p>Say which error you mean, in two ways. Name the specific type of exception, and give <code>match</code> a piece of text (a <a href="../reference/glossary.html#regular-expression">regular expression</a>) that the error message must contain. <code>pytest.raises()</code> belongs to pytest, so add <code>import pytest</code> to the imports at the top of the test file first.</p>
 
   <figure class="code py">
     <figcaption><span>tests/test_clean.py</span></figcaption>
@@ -187,7 +187,7 @@ tests\test_clean.py:55: AssertionError</pre>
 E         Expected regex: 'must be a numeric column'
 E         Actual message: "unsupported operand type(s) for -: 'str' and 'str'"</pre>
   </figure>
-  <span class="cite"><code>match</code>: “a string containing a regular expression… that is tested against the string representation of the exception”. <a href="https://docs.pytest.org/en/stable/how-to/assert.html#matching-exception-messages">pytest, “Matching exception messages”</a>. The test file now needs <code>import pytest</code> at the top.</span>
+  <span class="cite"><code>match</code>: “a string containing a regular expression… that is tested against the string representation of the exception”. <a href="https://docs.pytest.org/en/stable/how-to/assert.html#matching-exception-messages">pytest, “Matching exception messages”</a>.</span>
 
   <p>Now the test shows what a user of the function would see: an error of the right type, but a cryptic one from deep inside the arithmetic. The test is red, so improve the function by checking the input at the top:</p>
 
@@ -206,7 +206,19 @@ E         Actual message: "unsupported operand type(s) for -: 'str' and 'str'"</
   <p>Run the tests again and everything passes. The same failing-test-first rhythm fixed a bug a moment ago and has now added a feature.</p>
 
   <h2>Warnings</h2>
-  <p><code>parse_money(pd.Series(["n/a"]))</code> returns a missing value and warns <code>1 value(s) could not be parsed as money</code>. If that is the behaviour you want, say so with <code>pytest.warns()</code>, which works like <code>pytest.raises()</code>. To state that well-formed input is quiet, turn warnings into errors for the length of the test, so that any warning fails it.</p>
+  <p><code>parse_money(pd.Series(["n/a"]))</code> returns a missing value and warns <code>1 value(s) could not be parsed as money</code>. If that is the behaviour you want, say so with <code>pytest.warns()</code>, which works like <code>pytest.raises()</code>. To state that well-formed input is quiet, turn warnings into errors for the length of the test, so that any warning fails it. That uses Python's own <code>warnings</code> module, which needs importing too. The top of the test file now reads:</p>
+
+  <figure class="code py">
+    <figcaption><span>tests/test_clean.py</span></figcaption>
+<pre><code>import warnings
+
+import pandas as pd
+import pytest
+
+from clean import clean_names, parse_money, rescale01, summarise_by</code></pre>
+  </figure>
+
+  <p>And the two tests:</p>
 
   <figure class="code py">
     <figcaption><span>tests/test_clean.py</span></figcaption>
@@ -220,7 +232,7 @@ def test_parse_money_is_quiet_when_every_value_parses():
         warnings.simplefilter("error")
         parse_money(pd.Series(["$5"]))</code></pre>
   </figure>
-  <span class="cite">“To ensure that no warnings are emitted, use” <code>warnings.catch_warnings()</code> with <code>warnings.simplefilter("error")</code>. <a href="https://docs.pytest.org/en/stable/how-to/capture-warnings.html#additional-use-cases-of-warnings-in-tests">pytest, “How to capture warnings”</a>. The test file needs <code>import warnings</code> at the top.</span>
+  <span class="cite">“To ensure that no warnings are emitted, use” <code>warnings.catch_warnings()</code> with <code>warnings.simplefilter("error")</code>. <a href="https://docs.pytest.org/en/stable/how-to/capture-warnings.html#additional-use-cases-of-warnings-in-tests">pytest, “How to capture warnings”</a>.</span>
 
   <p>A warning that no test asked for does not fail the test, but it is not hidden either. pytest lists it under a <code>warnings summary</code> heading and counts it on the last line of the report:</p>
 
@@ -232,7 +244,7 @@ tests/test_demo.py::test_parse_money_turns_junk_into_missing
     assert parse_money(pd.Series(["n/a"])).isna().all()
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-======================== 10 passed, 1 warning in 2.51s ========================</pre>
+======================== 13 passed, 1 warning in 6.31s ========================</pre>
   </figure>
 
   <p>Treat a warning count on the last line as something to investigate.</p>

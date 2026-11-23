@@ -82,7 +82,7 @@ def test_rescale01_maps_smallest_to_0_and_largest_to_1():
     </tbody>
   </table>
   </div>
-  <p>Test file names must start with <code>test_</code> and end with <code>.py</code>; test function names must start with <code>test</code>. Useful switches: <code>-v</code> lists every test, <code>-x</code> stops at the first failure, <code>--lf</code> reruns only the tests that failed last time. (<a href="../lessons/0002-test-functions-and-test-files.html">Lesson 2</a>, <a href="../lessons/0005-from-project-to-package.html">Lesson 5</a>)</p>
+  <p>Test file names must start with <code>test_</code> and end with <code>.py</code> (or end with <code>_test.py</code>); test function names must start with <code>test</code>. Useful switches: <code>-v</code> lists every test, <code>-x</code> stops at the first failure, <code>--lf</code> reruns only the tests that failed last time. (<a href="../lessons/0002-test-functions-and-test-files.html">Lesson 2</a>, <a href="../lessons/0005-from-project-to-package.html">Lesson 5</a>)</p>
 
   <h2>Reading the report</h2>
   <figure class="code out">
@@ -97,7 +97,7 @@ tests\test_clean.py:13: AssertionError                      where: file and line
 
 ========== 1 failed, 2 passed in 2.63s ==========           tests, not assertions</pre>
   </figure>
-  <p>Then decide which side is wrong: the function or the test. A test stops at its first failing assertion. <code>ModuleNotFoundError: No module named 'clean'</code> means Python could not find your functions: run <code>python -m pytest</code> from the project folder, or in a package, activate the environment and install.</p>
+  <p>Then decide which side is wrong: the function or the test. A test stops at its first failing assertion. <code>ModuleNotFoundError: No module named 'clean'</code> means Python could not find your functions: run <code>python -m pytest</code> from the project folder. In a package the message names <code>'cleaner'</code>: activate the environment and install the package.</p>
 
   <h2>Habits</h2>
   <ul>

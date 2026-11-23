@@ -36,7 +36,7 @@
   <section class="quiz" aria-label="Warm-up">
     <ol class="questions">
       <li class="q">
-        <p class="stem">What does <code>pytest.raises(TypeError, match="must be numeric")</code> check about the error that is raised?</p>
+        <p class="stem">What does <code>pytest.raises(TypeError, match="must be a numeric column")</code> check about the error that is raised?</p>
         <ul class="opts">
           <li data-correct>The error's type and its message.</li>
           <li>The error's type and its traceback.</li>
@@ -111,13 +111,18 @@ addopts = ["--import-mode=importlib"]</code></pre>
       </figure>
     </li>
     <li>
-      <strong>Make a virtual environment</strong> for the package and switch it on. Open a terminal in the top <code>cleaner</code> folder. Use the first <code>activate</code> line on Windows and the second on macOS or Linux.
+      <strong>Make a virtual environment</strong> for the package and switch it on. Open a terminal in the top <code>cleaner</code> folder and run the two lines for your system, one at a time.
       <figure class="code sh">
-        <figcaption><span>Terminal, in cleaner/</span></figcaption>
+        <figcaption><span>Terminal, in cleaner/ (Windows)</span></figcaption>
 <pre><code>python -m venv .venv
-.venv\Scripts\activate          # Windows
-source .venv/bin/activate       # macOS and Linux</code></pre>
+.venv\Scripts\activate</code></pre>
       </figure>
+      <figure class="code sh">
+        <figcaption><span>Terminal, in cleaner/ (macOS and Linux)</span></figcaption>
+<pre><code>python3 -m venv .venv
+source .venv/bin/activate</code></pre>
+      </figure>
+      Your prompt now starts with <code>(.venv)</code>. If Windows PowerShell refuses to run the activate script, the Python documentation gives the one-time fix: <code>Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser</code>.
     </li>
     <li>
       <strong>Install your package</strong> into that environment, in editable mode (<code>-e</code>), together with the <code>dev</code> group. The dot means “the project in this folder”.
@@ -158,7 +163,7 @@ tests\test_clean.py ............                                         [100%]
       </figure>
     </li>
   </ol>
-  <span class="cite">“You can then create a virtual environment and install your package in ‘editable’ mode, together with the <code>dev</code> group”; “<code>pip install --group</code> needs pip 25.1 or newer”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#install-package-in-a-virtual-environment">pytest, “Install package in a virtual environment”</a>. If pip rejects <code>--group</code>, run <code>python -m pip install --upgrade pip</code> first.</span>
+  <span class="cite">“You can then create a virtual environment and install your package in ‘editable’ mode, together with the <code>dev</code> group”; “<code>pip install --group</code> needs pip 25.1 or newer”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#install-package-in-a-virtual-environment">pytest, “Install package in a virtual environment”</a>. If pip rejects <code>--group</code>, run <code>python -m pip install --upgrade pip</code> first. Creating and activating: <a href="https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/">Python Packaging User Guide</a>; the PowerShell note: <a href="https://docs.python.org/3/library/venv.html">Python documentation, <code>venv</code></a>.</span>
 
   <h2>What you now have</h2>
 

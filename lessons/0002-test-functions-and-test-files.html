@@ -82,7 +82,7 @@
 └── tests/
     └── test_clean.py     tests for the functions in clean.py</pre>
 
-  <p>Two rules matter. pytest looks for files whose names start with <code>test_</code> and end with <code>.py</code>, and inside them for functions whose names start with <code>test</code>. A file called <code>clean_tests.py</code> is not treated as a test file, and a function called <code>check_rescale01()</code> is not treated as a test. pytest skips both without a word.</p>
+  <p>Two rules matter. pytest looks for files whose names start with <code>test_</code> and end with <code>.py</code> (it also accepts names that end with <code>_test.py</code>; this course uses the first form), and inside them for functions whose names start with <code>test</code>. A file called <code>clean_tests.py</code> is not treated as a test file, and a function called <code>check_rescale01()</code> is not treated as a test. pytest skips both without a word.</p>
   <span class="cite">pytest will “search for <code>test_*.py</code> or <code>*_test.py</code> files”. <a href="https://docs.pytest.org/en/stable/explanation/goodpractices.html#conventions-for-python-test-discovery">pytest, “Conventions for Python test discovery”</a>. The pairing <code>clean.py</code> ↔ <code>test_clean.py</code>: “Test files should be named <code>test_{file under test}.py</code>”, <a href="https://learn.scientific-python.org/development/principles/testing/">Scientific Python Development Guide</a>.</span>
 
   <p>So there are three levels, each inside the next: <strong>assertions</strong> are grouped into <strong>tests</strong>, and tests are organised in <strong>files</strong>.</p>
@@ -118,7 +118,7 @@ def test_parse_money_strips_dollar_signs_and_commas():
   </div>
 
   <h2>Run everything</h2>
-  <p>Open a terminal in the project folder, the one that contains <code>clean.py</code>, and run one command.</p>
+  <p>Open a terminal in the project folder, the one that contains <code>clean.py</code>, and run one command. A terminal is your computer's command line, not the Python console: there is no <code>&gt;&gt;&gt;</code> prompt. Most editors have one built in, and it usually opens in the folder you have open in the editor.</p>
 
   <figure class="code sh">
     <figcaption><span>Terminal, in cleaning-project/</span></figcaption>
@@ -187,7 +187,7 @@ FAILED tests/test_clean.py::test_clean_names_returns_lower_case_snake_case - ...
 
   <h2>Try it</h2>
   <ol class="steps">
-    <li>Download the <a href="https://github.com/acatlin/python-unit-testing/tree/main/examples/cleaning-project-starter">starter project</a> (or build the two files above by hand; typing them is good practice, and <code>clean.py</code> is in the starter folder). You need pandas and pytest installed.</li>
+    <li>Get the <a href="https://github.com/acatlin/python-unit-testing/tree/main/examples/cleaning-project-starter">starter project</a>: on the <a href="https://github.com/acatlin/python-unit-testing">repository's front page</a> choose Code, then Download ZIP, unzip it, and copy the folder <code>examples/cleaning-project-starter</code> somewhere of your own. Or build the two files by hand: copy <code>clean.py</code> from that page and type the test file above, which is good practice. You need pandas and pytest installed.</li>
     <li>Open a terminal in the project folder and run <code>python -m pytest</code>. You should see <code>3 passed</code>.</li>
     <li>Add a third assertion to the <code>parse_money()</code> test, for the input <code>"$3,000"</code>, and run again. The count is still 3, because pytest counts tests. Now move that assertion into a new test of its own, with a name that says what it checks, and watch the count become 4.</li>
     <li>Rename the test file to <code>clean_tests.py</code> and run again. You should see <code>collected 0 items</code> and <code>no tests ran</code>. Rename it back.</li>
