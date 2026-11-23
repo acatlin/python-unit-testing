@@ -34,7 +34,7 @@
 
   <div class="box">
     <span class="label">Run it in your browser</span>
-    <p><a href="https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/0005-from-project-to-package.ipynb">Open this lesson's code in Google Colab</a>. No installing; you need a Google account. The notebook installs the pandas and pytest used on this page, but it runs on Linux with Colab's own Python, so the <code>platform</code> line, the paths and the timings will not match what is shown here. A Colab session is already a throwaway environment, so the notebook leaves out step 3, the virtual environment. Do that step on your own computer.</p>
+    <p><a href="https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/0005-from-project-to-package.ipynb">Open this lesson's code in Google Colab</a>. No installing; you need a Google account. Colab has the pandas used on this page, and the notebook installs the pytest. It runs on Linux, so the <code>platform</code> line, the paths and the timings will not match what is shown here. A Colab session is already a throwaway environment, so the notebook leaves out step 3, the virtual environment. Do that step on your own computer.</p>
   </div>
 
   <h2>From last time</h2>
@@ -137,7 +137,7 @@ source .venv/bin/activate</code></pre>
       </figure>
       <figure class="code out pass">
         <figcaption><span>Terminal (last line)</span></figcaption>
-<pre>Successfully installed cleaner-0.1.0 colorama-0.4.6 iniconfig-2.3.1 numpy-2.5.5 packaging-26.3 pandas-3.1.1 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 python-dateutil-4.0.0 tzdata-2026.6</pre>
+<pre>Successfully installed cleaner-0.1.0 colorama-0.4.6 iniconfig-2.3.1 numpy-2.5.5 packaging-26.3 pandas-2.2.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 python-dateutil-4.0.0 pytz-2026.6 tzdata-2026.6</pre>
       </figure>
     </li>
     <li>
@@ -156,7 +156,7 @@ source .venv/bin/activate</code></pre>
       <figure class="code out pass">
         <figcaption><span>Terminal</span></figcaption>
 <pre>============================= test session starts =============================
-platform win32 -- Python 3.14.4, pytest-9.2.0, pluggy-1.7.0
+platform win32 -- Python 3.13.5, pytest-9.2.0, pluggy-1.7.0
 rootdir: C:\Users\you\cleaner
 configfile: pyproject.toml
 testpaths: tests
@@ -164,7 +164,7 @@ collected 12 items
 
 tests\test_clean.py ............                                         [100%]
 
-============================= 12 passed in 5.60s ==============================</pre>
+============================= 12 passed in 6.38s ==============================</pre>
       </figure>
     </li>
   </ol>
@@ -311,7 +311,7 @@ tests\test_clean.py ............                                         [100%]
     <a href="0004-edge-cases-errors-and-bugs.html">← Lesson 4: Edge cases, errors and bugs</a>
     <a class="next" href="../index.html">Course home →</a>
   </nav>
-  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.14.4 with pytest 9.2.0, pandas 3.1.1 and pip 26.0.1 on Windows; the folder after <code>rootdir:</code> is shortened, and the versions in the install line will be newer when you run it.</p>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.13.5 with pytest 9.2.0, pandas 2.2.3 and pip 25.1.1 on Windows; the folder after <code>rootdir:</code> is shortened. For the install line, pandas was held at 2.2.3, the version Google Colab provides and the rest of this course shows; your own install will fetch the newest pandas, so that line will list newer versions and may list fewer packages.</p>
 </main>
 </body>
 </html>

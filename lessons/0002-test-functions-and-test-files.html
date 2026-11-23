@@ -34,7 +34,7 @@
 
   <div class="box">
     <span class="label">Run it in your browser</span>
-    <p><a href="https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/0002-test-functions-and-test-files.ipynb">Open this lesson's code in Google Colab</a>. No installing; you need a Google account. The notebook installs the pandas and pytest used on this page, but it runs on Linux with Colab's own Python, so the <code>platform</code> line, the paths and the timings will not match what is shown here.</p>
+    <p><a href="https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/0002-test-functions-and-test-files.ipynb">Open this lesson's code in Google Colab</a>. No installing; you need a Google account. Colab has the pandas used on this page, and the notebook installs the pytest. It runs on Linux, so the <code>platform</code> line, the paths and the timings will not match what is shown here.</p>
   </div>
 
   <h2>From last time</h2>
@@ -132,13 +132,13 @@ def test_parse_money_strips_dollar_signs_and_commas():
   <figure class="code out pass">
     <figcaption><span>Terminal</span></figcaption>
 <pre>============================= test session starts =============================
-platform win32 -- Python 3.14.4, pytest-9.2.0, pluggy-1.7.0
+platform win32 -- Python 3.13.5, pytest-9.2.0, pluggy-1.7.0
 rootdir: C:\Users\you\cleaning-project
 collected 3 items
 
 tests\test_clean.py ...                                                  [100%]
 
-============================== 3 passed in 2.39s ==============================</pre>
+============================== 3 passed in 7.87s ==============================</pre>
   </figure>
 
   <p>pytest searched the folder, found one test file and <a href="../reference/glossary.html#collection">collected</a> three tests from it. Each row is one test file, with one dot for each test that passed. Note what is being counted: 3 is the number of <em>tests</em>, not the number of assertions (6) or files (1).</p>
@@ -268,7 +268,7 @@ FAILED tests/test_clean.py::test_clean_names_returns_lower_case_snake_case - ...
     <a href="0001-first-assertion.html">← Lesson 1: Your first assertion</a>
     <a class="next" href="0003-choosing-assertions.html">Lesson 3: Choosing the right assertion →</a>
   </nav>
-  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.14.4 with pytest 9.2.0 on Windows; the folder after <code>rootdir:</code> is shortened. On macOS and Linux the command may be <code>python3</code>, paths use <code>/</code>, and the timings will differ.</p>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.13.5 with pytest 9.2.0 and pandas 2.2.3 on Windows; the folder after <code>rootdir:</code> is shortened. On macOS and Linux the command may be <code>python3</code>, paths use <code>/</code>, and the timings will differ.</p>
 </main>
 </body>
 </html>

@@ -26,9 +26,11 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 OUT = ROOT / "notebooks"
 
-# The versions the lesson pages quote. Colab ships older ones (see RESOURCES.md),
-# so every notebook installs these first.
-PANDAS = "3.1.1"
+# The versions the lesson pages quote. The pandas is the one Colab ships (see
+# RESOURCES.md), so in Colab its pin installs nothing; it is there for runs
+# outside Colab, and for the day Colab moves on. Colab's pytest is older than
+# the pages' one, so that is the package the first cell really installs.
+PANDAS = "2.2.3"
 PYTEST = "9.2.0"
 
 SITE = "https://acatlin.github.io/python-unit-testing/"
@@ -128,10 +130,8 @@ def setup(extra_versions: str = "") -> list[dict]:
         md("""
 ## Set up
 
-Colab comes with older versions of pandas and pytest than the lesson page was written with. The next cell installs the versions the page uses, so that what you see here matches it. It can take a minute.
-
-pip may end with a message that other packages in Colab want the older pandas. This notebook does not use them, so carry on. If Colab asks you to restart the session, do that, then continue from the cell after this one.
-"""),
+Colab already has the pandas the lesson page was written with, version {PANDAS}. Its pytest is older than the page's, so the next cell installs pytest {PYTEST}. Then what you see here matches the page. It takes a few seconds.
+""".format(PANDAS=PANDAS, PYTEST=PYTEST)),
         code(f'%pip install -q "pandas=={PANDAS}" "pytest=={PYTEST}"'),
         md("Check what you have. A line that starts with `!` goes to the computer's command line, not to Python: it is this notebook's stand-in for the terminal."),
         code("!python --version\n!python -m pytest --version\n"
@@ -147,7 +147,7 @@ The lesson has you save files in an editor and type commands in a terminal. A no
 - **`%%writefile name`** on the first line of a cell saves the rest of the cell as a file, in place of running it. To change the file, edit the cell and run it again. (You can also open the file from the folder icon at the left edge of Colab.)
 - **`!`** at the start of a line sends it to the command line. Every `!` line starts in the notebook's own folder, so the commands below begin with `cd {PROJECT} &&` to step into the project first.
 
-**What will look different from the lesson page.** The page shows output captured on Windows with Python 3.14. Colab runs Linux with its own Python. So the `platform` line says `linux` and another Python version, `rootdir:` is a folder under `/content`, paths are written with `/` in place of `\\`, the rules of `=` signs may be wider or narrower, and the timings differ. The results are the same: the dots and `F`s, the lines marked `E`, and the counts on the last line.
+**What will look different from the lesson page.** The page shows output captured on Windows with Python 3.13. Colab runs Linux. So the `platform` line says `linux` and may name a slightly different Python, `rootdir:` is a folder under `/content`, paths are written with `/` in place of `\\`, the rules of `=` signs may be wider or narrower, and the timings differ. The results are the same: the dots and `F`s, the lines marked `E`, and the counts on the last line.
 """)
 
 MAKE_PROJECT = code(f'import os\n\nos.makedirs("{PROJECT}/tests", exist_ok=True)')
@@ -437,7 +437,7 @@ On your own computer, do not skip it. The commands are at the end of this notebo
 - **`%%writefile name`** on the first line of a cell saves the rest of the cell as a file, in place of running it. To change the file, edit the cell and run it again.
 - **`!`** at the start of a line sends it to the command line. Every `!` line starts in the notebook's own folder, so the commands below begin with `cd {pkg} &&` to step into the package first.
 
-**What will look different from the lesson page.** The page shows output captured on Windows with Python 3.14. Colab runs Linux with its own Python. So the `platform` line says `linux` and another Python version, `rootdir:` is `/content/{pkg}`, paths are written with `/`, the timings differ, and pip's list of what it installed is shorter, because Colab has most of those packages already.
+**What will look different from the lesson page.** The page shows output captured on Windows with Python 3.13. Colab runs Linux. So the `platform` line says `linux` and may name a slightly different Python, `rootdir:` is `/content/{pkg}`, paths are written with `/`, the timings differ, and pip's list of what it installed is shorter, because Colab has most of those packages already.
 """),
         md("""
 ## Build it

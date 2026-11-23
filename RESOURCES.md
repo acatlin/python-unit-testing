@@ -22,7 +22,7 @@ All entries below were fetched and read on 2026-11-23 unless marked otherwise.
   Use for: arrange, act, assert, cleanup.
 - [Docs: pytest, "How to re-run failed tests…"](https://docs.pytest.org/en/stable/how-to/cache.html) and ["How to handle test failures"](https://docs.pytest.org/en/stable/how-to/failures.html)
   Use for: `--lf` and `-x`.
-- [Docs: pandas API reference, `assert_frame_equal()`](https://pandas.pydata.org/docs/reference/api/pandas.testing.assert_frame_equal.html) and [`assert_series_equal()`](https://pandas.pydata.org/docs/reference/api/pandas.testing.assert_series_equal.html) (documents pandas 3.1)
+- [Docs: pandas API reference, `assert_frame_equal()`](https://pandas.pydata.org/docs/reference/api/pandas.testing.assert_frame_equal.html) and [`assert_series_equal()`](https://pandas.pydata.org/docs/reference/api/pandas.testing.assert_series_equal.html) (the page documents pandas 3.1; the course runs pandas 2.2.3, and everything taken from this entry was confirmed by running it there)
   Use for: `check_dtype` (default `True`), `check_exact`, `rtol` (default `1e-5`) and `atol` (default `1e-8`), `check_like`, and the dtype example in the docstring.
 - [Docs: pandas user guide, "Working with missing data"](https://pandas.pydata.org/docs/user_guide/missing_data.html) and ["Frequently Asked Questions"](https://pandas.pydata.org/docs/user_guide/gotchas.html)
   Use for: `np.nan == np.nan` being `False`, and why `if` or `assert` on a Series raises "The truth value of a Series is ambiguous".
@@ -43,7 +43,9 @@ All entries below were fetched and read on 2026-11-23 unless marked otherwise.
 - [Data: `googlecolab/backend-info`](https://github.com/googlecolab/backend-info), files `pip-freeze.txt` and `apt-list.txt` (last changed 2026-11-20)
   Use for: what Colab ships. On 2026-11-23: Python 3.13.18, pandas 2.2.3, pytest 8.4.2, pip 26.2.2, numpy 2.4.6. The README warns the files can be a day or two ahead of the live runtime.
 - [Docs: Google Colab, "Frequently Asked Questions - Past Runtime Versions"](https://research.google.com/colaboratory/runtime-version-faq.html)
-  Use for: "we recommend using the latest runtime version… and adding code to your notebook to install specific versions of libraries that you need", which is why each notebook starts with a `%pip install` of pinned versions and does not pin a runtime.
+  Use for: "we recommend using the latest runtime version… and adding code to your notebook to install specific versions of libraries that you need", which is why each notebook starts with a `%pip install` of pinned versions and does not pin a runtime. Since the course moved to Colab's pandas (2.2.3), only the pytest pin installs anything there.
+- [Data: PyPI, pandas 2.2.3 files](https://pypi.org/project/pandas/2.2.3/#files) (checked 2026-11-23)
+  Use for: pandas 2.2.3 has wheels for Python 3.9 to 3.13 and none for 3.14, so it cannot be the version students with a current Python install on their own computers.
 - [Docs: IPython, "Built-in magic commands"](https://ipython.readthedocs.io/en/stable/interactive/magics.html)
   Use for: `%%writefile [-a] filename`: "Write the contents of the cell to a file. The file will be overwritten unless the -a (--append) flag is specified."
 - For the extension: pytest ["How to parametrize fixtures and test functions"](https://docs.pytest.org/en/stable/how-to/parametrize.html), ["How to use fixtures"](https://docs.pytest.org/en/stable/how-to/fixtures.html), ["How to use temporary directories and files in tests"](https://docs.pytest.org/en/stable/how-to/tmp_path.html), ["How to use skip and xfail…"](https://docs.pytest.org/en/stable/how-to/skipping.html); [Coverage.py](https://coverage.readthedocs.io/en/latest/) (documents 7.17.5) and the [pytest-cov README](https://pytest-cov.readthedocs.io/en/latest/readme.html); [GitHub Docs, "Building and testing Python"](https://docs.github.com/en/actions/tutorials/build-and-test-code/python).
@@ -75,7 +77,9 @@ All entries below were fetched and read on 2026-11-23 unless marked otherwise.
 - A file named `clean_tests.py` is not collected: `collected 0 items`, `no tests ran`, exit code 5.
 - `rescale01(pd.Series([0.1, 0.2, 0.3])).tolist()` is `[0.0, 0.5000000000000001, 1.0]`, a natural example of floating-point noise for Lesson 1.
 - `rescale01(pd.Series([5, 5, 5]))` returns `NaN` with no error and no warning: pandas suppresses the divide-by-zero warning that NumPy would give.
-- With pandas 3, a column of text has dtype `str` (it was `object` in pandas 2), and subtracting one from another raises `TypeError: unsupported operand type(s) for -: 'str' and 'str'`.
+- A column of text has dtype `object` in pandas 2.2.3 and `str` in pandas 3. In both, subtracting one from another raises `TypeError: unsupported operand type(s) for -: 'str' and 'str'`.
+- Run on 2026-11-23 under pandas 2.2.3 (Python 3.13.5) and pandas 3.1.1 (Python 3.14.4): all example tests pass on both, and one quoted output line differs. `assert` on a Series says "Use a.empty, a.bool(), a.item(), a.any() or a.all()." in 2.2.3 and leaves out `a.bool()` in 3.1.1.
+- A fresh install of pandas 2.2.3 also brings in `pytz`; pandas 3.1.1 does not.
 - `pd.api.types.is_numeric_dtype()` is `True` for a boolean column, so the finished `rescale01()` lets `pd.Series([True, False])` through and it fails inside NumPy with a different cryptic `TypeError`. A good extra edge case for a strong student.
 - `clean_names("First Name")`, a bare string instead of a list, returns one entry per character. Used in L4-T3.
 - `pd.to_numeric()` returns `int64` when every value is whole, so `parse_money()` ends with `.astype("float64")` to return decimals every time.

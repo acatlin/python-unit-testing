@@ -34,7 +34,7 @@
 
   <div class="box">
     <span class="label">Run it in your browser</span>
-    <p><a href="https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/0003-choosing-assertions.ipynb">Open this lesson's code in Google Colab</a>. No installing; you need a Google account. The notebook installs the pandas and pytest used on this page, but it runs on Linux with Colab's own Python, so the <code>platform</code> line, the paths and the timings will not match what is shown here.</p>
+    <p><a href="https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/0003-choosing-assertions.ipynb">Open this lesson's code in Google Colab</a>. No installing; you need a Google account. Colab has the pandas used on this page, and the notebook installs the pytest. It runs on Linux, so the <code>platform</code> line, the paths and the timings will not match what is shown here.</p>
   </div>
 
   <h2>From last time</h2>
@@ -75,8 +75,9 @@ assert result == expected</code></pre>
   </figure>
   <figure class="code out fail">
     <figcaption><span>pytest report (last line)</span></figcaption>
-<pre>E       ValueError: The truth value of a Series is ambiguous. Use a.empty, a.item(), a.any() or a.all().</pre>
+<pre>E       ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().</pre>
   </figure>
+  <span class="cite">This is the wording of pandas 2.2.3. pandas 3 gives the same error without <code>a.bool()</code> in the list. Every other report in this course reads the same in both.</span>
 
   <p>That is not a failed assertion; it is a crash. On two Series, <code>==</code> compares element by element and returns a whole column of <code>True</code> and <code>False</code>. <code>assert</code> needs a single answer, and pandas refuses to guess one. There are two ways round it. Compare what each tells you when the check fails.</p>
   <span class="cite">“pandas follows the NumPy convention of raising an error when you try to convert something to a <code>bool</code>.” <a href="https://pandas.pydata.org/docs/user_guide/gotchas.html">pandas user guide, “Frequently Asked Questions”</a>.</span>
@@ -278,7 +279,7 @@ E   At positional index 1, first diff: 60.0 != 50.0</pre>
     <a href="0002-test-functions-and-test-files.html">← Lesson 2: Test functions and test files</a>
     <a class="next" href="0004-edge-cases-errors-and-bugs.html">Lesson 4: Edge cases, errors and bugs →</a>
   </nav>
-  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.14.4 with pytest 9.2.0 and pandas 3.1.1. Reports are shortened to the lines that start with <code>E</code>.</p>
+  <p class="colophon">Keep handy: <a href="../reference/cheat-sheet.html">cheat sheet</a> · <a href="../reference/glossary.html">glossary</a>. Output on this page is from Python 3.13.5 with pytest 9.2.0 and pandas 2.2.3, the pandas Google Colab provides. Reports are shortened to the lines that start with <code>E</code>.</p>
 </main>
 </body>
 </html>

@@ -52,14 +52,16 @@ python -m pip install -e examples/cleaner --group examples/cleaner/pyproject.tom
 
 The notebook check also needs `nbclient` and `ipykernel`. The Lesson 5 notebook installs its own copy of the package into the environment the check runs in; the check puts the `examples/cleaner` install back afterwards.
 
-The first two run on every push in GitHub Actions (`.github/workflows/check.yml`), on Python 3.11 and 3.14, and so does the notebook check, on Python 3.13 and Linux, which is what Colab runs. The third is run by hand before changing a lesson's output: the pages quote one set of versions, so it is expected to need attention when pytest or pandas changes its wording.
+The pages quote pandas 2.2.3, the version Google Colab ships. It has no build for Python 3.14, so run the third command and the notebook check with Python 3.13 or older and `pandas==2.2.3` installed.
+
+The first two run on every push in GitHub Actions (`.github/workflows/check.yml`): the examples on Python 3.11 and 3.13 with pandas 2.2.3 and on Python 3.14 with the newest pandas, which is what a student's own `pip install` fetches. So does the notebook check, on Python 3.13 and Linux, which is what Colab runs. The third is run by hand before changing a lesson's output: the pages quote one set of versions, so it is expected to need attention when pytest or pandas changes its wording.
 
 Quiz rules enforced by the checker: four options per question, exactly one correct, and all options the same number of words and of similar length, so the answer cannot be guessed from its shape.
 
 ## Running the examples in Google Colab
 
-Each lesson page links to its notebook: `https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/<lesson>.ipynb`. A notebook writes the lesson's files with `%%writefile` and runs them with `!python -m pytest`, so students follow the same file-based workflow as the pages. Its first cell installs the pandas and pytest versions the pages quote, because Colab ships older ones. Lesson 5 installs the package straight into the Colab runtime and leaves the virtual environment for the student's own computer.
+Each lesson page links to its notebook: `https://colab.research.google.com/github/acatlin/python-unit-testing/blob/main/notebooks/<lesson>.ipynb`. A notebook writes the lesson's files with `%%writefile` and runs them with `!python -m pytest`, so students follow the same file-based workflow as the pages. The pages quote the pandas Colab ships, 2.2.3, so a notebook's first cell only has to install pytest 9.2.0 (Colab's is 8.4.2, and Lesson 5 needs 9); the cell names both versions, and the pandas pin installs nothing in Colab. Lesson 5 installs the package straight into the Colab runtime and leaves the virtual environment for the student's own computer.
 
 ## Sources
 
-The lessons follow the [pytest documentation](https://docs.pytest.org/en/stable/), the [pandas testing reference](https://pandas.pydata.org/docs/reference/testing.html), the [Scientific Python Development Guide](https://learn.scientific-python.org/development/principles/testing/) and the [Python Packaging User Guide](https://packaging.python.org/en/latest/). All code and output shown was run with Python 3.14.4, pytest 9.2.0 and pandas 3.1.1. See `RESOURCES.md`.
+The lessons follow the [pytest documentation](https://docs.pytest.org/en/stable/), the [pandas testing reference](https://pandas.pydata.org/docs/reference/testing.html), the [Scientific Python Development Guide](https://learn.scientific-python.org/development/principles/testing/) and the [Python Packaging User Guide](https://packaging.python.org/en/latest/). All code and output shown was run with Python 3.13.5, pytest 9.2.0 and pandas 2.2.3. See `RESOURCES.md`.

@@ -16,8 +16,10 @@ For each notebook it checks that:
     twelve tests and the same functions as examples/cleaning-project, after
     Lesson 5 the same files as examples/cleaner.
 
-Each notebook runs in a temporary folder. Its first cell installs the pandas
-and pytest versions the pages quote, as it does in Colab. The Lesson 5
+Each notebook runs in a temporary folder. Its first cell pins the pandas and
+pytest versions the pages quote (in Colab that pandas is already there, so
+only pytest is installed). pandas 2.2.3 has no build for Python 3.14, so run
+this with Python 3.13 or older. The Lesson 5
 notebook installs its package into the environment this script runs in; if
 examples/cleaner was installed there (as tools/run_examples.py needs), it is
 installed again afterwards.
